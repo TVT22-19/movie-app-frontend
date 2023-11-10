@@ -1,7 +1,7 @@
 {
   "name": "movie-app-frontend",
   "private": true,
-  "homepage": "/movie-app-frontend/",
+  "homepage": "https://tvt22-19.github.io/movie-app-frontend/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

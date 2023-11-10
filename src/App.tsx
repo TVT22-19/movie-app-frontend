@@ -12,8 +12,9 @@ export default function App() {
                         <Route index element={<HomePage/>}/>
                         <Route path="*" element={<NotFoundPage/>}/>
                     </Route>
-                )
-            )
+                ), {
+                    basename: "/movie-app-frontend/"
+                })
         }/>
     )
 }
