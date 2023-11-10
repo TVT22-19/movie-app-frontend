@@ -1,7 +1,7 @@
 {
   "name": "movie-app-frontend",
   "private": true,
-  "homepage": "/movie-app-frontend",
+  "homepage": "/movie-app-frontend/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
