@@ -2,7 +2,7 @@
 
 ## File structure
 
-```plaintext
+```ruby
 movie-app-frontend/
 |-- src/
 |   |-- assets/
