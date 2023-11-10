@@ -1,9 +1,19 @@
-import './App.css'
+import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom";
+import RootPage from "./pages/RootPage.tsx";
+import HomePage from "./pages/HomePage.tsx";
+import NotFoundPage from "./pages/NotFoundPage.tsx";
 
 export default function App() {
     return (
-        <>
-            <h1>Movie App Frontend</h1>
-        </>
+        <RouterProvider router={
+            createBrowserRouter(
+                createRoutesFromElements(
+                    <Route path="/" element={<RootPage/>}>
+                        <Route index element={<HomePage/>}/>
+                        <Route path="*" element={<NotFoundPage/>}/>
+                    </Route>
+                )
+            )
+        }/>
     )
 }
