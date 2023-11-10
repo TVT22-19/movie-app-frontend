@@ -1,31 +1,61 @@
-# React + TypeScript + Vite
+# Movie App Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## File structure
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md)
-  uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast
-  Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
+```plaintext
+movie-app-frontend/
+|-- src/
+|   |-- assets/
+|   |   |-- images/
+|   |   |-- styles/
+|   |-- components/
+|   |-- constants/
+|   |-- hooks/
+|   |-- pages/
+|   |-- services/
+|   |-- utils/
+|   |-- App.tsx
+|   |-- index.tsx
+|-- .eslintrc
+|-- .gitignore
+|-- index.html
+|-- tsconfig.json
+|-- tsconfig.node.json
+|-- vite.config.js
+|-- package.json
+|-- README.md
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked`
-  or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and
-  add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Explanation:
+
+- **src/**: This is where most of your source code will reside.
+
+  - **assets/**: Contains static assets like images and styles.
+
+  - **components/**: Reusable React components.
+
+  - **constants/**: Constants used throughout the application.
+
+  - **hooks/**: Custom React hooks.
+
+  - **pages/**: React components that represent different pages in your application.
+
+  - **services/**: Utility functions or services for interacting with APIs or performing other tasks.
+
+  - **utils/**: General utility functions.
+
+  - **App.tsx**: The root component of your React application.
+
+  - **index.tsx**: The entry point of your application.
+
+- **.gitignore**: Specifies files and directories that should be ignored by version control.
+
+- **public/**: Contains the `index.html` file and other public assets.
+
+- **tsconfig.json**: TypeScript configuration file.
+
+- **vite.config.js**: Vite configuration file.
+
+- **package.json**: Node.js package configuration file.
+
+- **README.md**: Documentation for your project.
