@@ -4,7 +4,7 @@ import {CSSProperties} from "react";
 export default function CenteredContainer(props: CentredContainerProps) {
 
     const containerStyle: CSSProperties = {
-        height: "100svh",
+        height: "calc(100svh - 64px - 64px)",
         display: "flex",
         flexDirection: "column",
         flexWrap: "wrap",
