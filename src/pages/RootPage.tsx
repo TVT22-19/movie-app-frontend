@@ -12,14 +12,18 @@ import {
     ListItemIcon,
     ListItemText, styled,
     Toolbar,
-    Typography
+    Typography, useTheme
 } from "@mui/material";
 import {AccountCircle, DarkMode, Group, LightMode, Search as SearchIcon} from "@mui/icons-material";
-import {useState} from "react";
+import {useContext} from "react";
+import {ColorModeContext} from "../App.tsx";
 
 export default function RootPage() {
 
     const navigate = useNavigate()
+
+    const theme = useTheme();
+    const colorMode = useContext(ColorModeContext);
 
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
@@ -71,8 +75,6 @@ export default function RootPage() {
         "Group 4",
     ]
 
-    const [darkMode, setDarkMode] = useState(false)
-
     return (
         <Box sx={{display: 'flex'}}>
             <CssBaseline/>
@@ -93,8 +95,8 @@ export default function RootPage() {
                     </Search>
 
                     <Box sx={{display: {xs: 'none', md: 'flex'}}}>
-                        <IconButton size="large" color="inherit" onClick={() => setDarkMode(!darkMode)}>
-                            {darkMode ? <DarkMode/> : <LightMode/>}
+                        <IconButton size="large" color="inherit" onClick={colorMode.toggleColorMode}>
+                            {theme.palette.mode === 'dark' ? <DarkMode/> : <LightMode/>}
                         </IconButton>
                         <IconButton size="large" edge="end" color="inherit">
                             <AccountCircle/>
