@@ -1,8 +1,9 @@
 import TextField from "@mui/material/TextField";
 import {Button, Card, Container, Divider, Stack, Typography} from "@mui/material";
 import {useState} from "react";
-import {Link, useLocation} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {User} from "../services/types";
+import {useAuth} from "../hooks/useAuth.tsx";
 
 export default function LoginPage() {
     const {state} = useLocation()
@@ -10,6 +11,11 @@ export default function LoginPage() {
     const [username, setUsername] = useState<string>(state?.username || "")
     const [password, setPassword] = useState<string>("")
     const [user, setUser] = useState<User>()
+
+    const navigate = useNavigate()
+
+    const {isAuthorized, setToken} = useAuth()
+    if (isAuthorized) navigate("/profile")
 
     function loginUser(username: string, password: string) {
         setUser(undefined)
@@ -23,6 +29,9 @@ export default function LoginPage() {
             username: username,
             password: password
         })
+
+        //TODO Add real authorization using API
+        setToken("TOKEN")
     }
 
     return (
@@ -35,7 +44,7 @@ export default function LoginPage() {
                     <TextField label="Password" variant="outlined" type="password"
                                onChange={(event) => setPassword(event.target.value)}/>
                     <Stack direction="row" divider={<Divider orientation="vertical" flexItem/>} spacing={2}>
-                        <Button color="inherit" variant="contained" sx={{flexGrow: 9}}
+                        <Button variant="contained" sx={{flexGrow: 9}}
                                 onClick={() => loginUser(username, password)}>Login</Button>
                         <Button color="inherit" variant="outlined" sx={{flexGrow: 1}} component={Link}
                                 to="/register">Register</Button>
