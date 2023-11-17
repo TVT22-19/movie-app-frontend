@@ -6,7 +6,7 @@ import RegisterPage from "./pages/RegisterPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
 import {AuthProvider, useAuth} from "./hooks/useAuth.tsx";
 import {ThemeSwitchProvider} from "./hooks/useThemeSwitch.tsx";
-import ProfilePage from "./pages/ProfilePage.tsx";
+import ProfilePage from "./pages/profile/ProfilePage.tsx";
 
 export default function App() {
 
