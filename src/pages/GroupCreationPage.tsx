@@ -1,11 +1,10 @@
 import TextField from "@mui/material/TextField";
-import {Button, Card, Container, Divider, Stack, Typography} from "@mui/material";
+import {Button, Card, Container, Stack, Typography} from "@mui/material";
 import {useState} from "react";
-import {Link, useLocation, useNavigate} from "react-router-dom";
 
 
 export default function LoginPage() {
-    const {state} = useLocation()
+   
 
     const [groupname, setGroupname] = useState<string>("")
     const [groupdesc, setGroupDescription] = useState<string>("")
