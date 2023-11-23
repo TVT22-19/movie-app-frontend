@@ -21,8 +21,6 @@ export default function LoginPage() {
         }
         //limit description length?
 
-    
-        
     }
 
     return (

@@ -26,7 +26,7 @@ const newsData = [
 
 export default function GroupPage() {
     return (
-        <Grid >
+        <Stack spacing={2} >
             <Card>
                 <CardHeader
                     avatar={<Avatar sx={{ bgcolor: blue[500], width: 56, height: 56 }}>
@@ -45,24 +45,22 @@ export default function GroupPage() {
             <Card>
                 <CardContent>
                     <Typography variant="h4">Members</Typography>
-                </CardContent>
-            </Card>
-
-
-
-            <Grid container spacing={2} style={{ backgroundColor: 'inherit', padding: 20 }}>
+                    <Grid container spacing={2} style={{ backgroundColor: 'inherit', padding: 5 }}>
                 {membersData.map((member) => (
                     <Grid key={member.id} item xs={12} sm={6} md={4} lg={3}>
                         <Card>
                             <Box style={{ display: 'flex', alignItems: 'center' }}>
                                 <Avatar src={member.avatar} alt={member.username} style={{ margin: '15px' }} />
-
                                 <Typography variant="subtitle2">{member.username}</Typography>
                             </Box>
                         </Card>
                     </Grid>
                 ))}
             </Grid>
+                </CardContent>
+            </Card>
+
+          
 
 
 
@@ -99,6 +97,6 @@ export default function GroupPage() {
             <StyledFab color="primary" aria-label="add" >
                 <GroupAdd />
             </StyledFab>
-        </Grid>
+        </Stack>
     )
 }
