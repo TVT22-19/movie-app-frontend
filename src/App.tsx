@@ -8,6 +8,7 @@ import RegisterPage from "./pages/RegisterPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
 import {AuthProvider, useAuth} from "./hooks/useAuth.tsx";
 import {ThemeSwitchProvider} from "./hooks/useThemeSwitch.tsx";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import ProfilePage from "./pages/profile/ProfilePage.tsx";
 
 export default function App() {
@@ -16,28 +17,30 @@ export default function App() {
 
     return (
         <ThemeSwitchProvider>
-            <AuthProvider userToken={token || ""}>
-                <RouterProvider router={
-                    createBrowserRouter(
-                        createRoutesFromElements(
-                            <Route path="/" element={<RootPage/>}>
-                                <Route index element={<HomePage/>}/>
+            <QueryClientProvider client={new QueryClient()}>
+                <AuthProvider userToken={token || ""}>
+                    <RouterProvider router={
+                        createBrowserRouter(
+                            createRoutesFromElements(
+                                <Route path="/" element={<RootPage/>}>
+                                    <Route index element={<HomePage/>}/>
 
-                                <Route path="login" element={<LoginPage/>}/>
-                                <Route path="register" element={<RegisterPage/>}/>
-                            
-                                <Route path="profile/:id" element={<ProfilePage/>}/>
+                                    <Route path="login" element={<LoginPage/>}/>
+                                    <Route path="register" element={<RegisterPage/>}/>
 
-                                <Route path="group" element={<GroupPage/>}/>
-                                <Route path="creategroup" element={<GroupCreationPage/>}/>
-                            
-                                <Route path="*" element={<NotFoundPage/>}/>
-                            </Route>
+                                    <Route path="profile/:id" element={<ProfilePage/>}/>
+
+                                    <Route path="group" element={<GroupPage/>}/>
+                                    <Route path="creategroup" element={<GroupCreationPage/>}/>
+
+                                    <Route path="*" element={<NotFoundPage/>}/>
+                               </Route>
                         ), {
                             basename: "/movie-app-frontend/"
                         })
                 }/>
-            </AuthProvider>
+              </AuthProvider>
+          </QueryClientProvider>
         </ThemeSwitchProvider>
     )
 }
