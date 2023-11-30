@@ -5,7 +5,7 @@ import LoginPage from "./pages/LoginPage.tsx";
 import GroupPage from "./pages/group/GroupPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
-import {AuthProvider, useAuth} from "./hooks/useAuth.tsx";
+import {AuthProvider} from "./hooks/useAuth.tsx";
 import {ThemeSwitchProvider} from "./hooks/useThemeSwitch.tsx";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import ProfilePage from "./pages/profile/ProfilePage.tsx";
@@ -30,13 +30,13 @@ export default function App() {
                                     <Route path="group/:id" element={<GroupPage/>}/>
 
                                     <Route path="*" element={<NotFoundPage/>}/>
-                               </Route>
-                        ), {
-                            basename: "/movie-app-frontend/"
-                        })
-                }/>
-              </AuthProvider>
-          </QueryClientProvider>
+                                </Route>
+                            ), {
+                                basename: "/movie-app-frontend/"
+                            })
+                    }/>
+                </AuthProvider>
+            </QueryClientProvider>
         </ThemeSwitchProvider>
     )
 }

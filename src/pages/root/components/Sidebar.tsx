@@ -43,8 +43,9 @@ export default function Sidebar() {
                                         <Group/>
                                     </ListItemIcon>
                                     <ListItemText primary={
-                                        <Typography overflow="hidden"
-                                                    textOverflow="ellipsis">{group.name}</Typography>
+                                        <Typography overflow="hidden" textOverflow="ellipsis">
+                                            {group.name}
+                                        </Typography>
                                     }/>
                                     <IconButton style={{padding: 4}}>
                                         <Check/>

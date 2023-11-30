@@ -40,16 +40,17 @@ export default function ProfilePage() {
                         </Stack>
                     </CardContent>
                 </Card>
+
                 <Divider/>
+
                 <Typography variant="h4" textAlign="center">Reviews</Typography>
                 {[1, 2, 3].map(() =>
                     <Card>
                         <CardContent>
                             Aut fugiat exercitationem vel non dolorum placeat sit nihil. Quaerat et et eos placeat
-                            placeat.
-                            Eaque voluptates nemo iste perspiciatis ullam est et debitis. Dolore cumque et sit labore
-                            necessitatibus corporis dolores praesentium. Cumque maxime quo iste quis dignissimos et sit
-                            doloremque.
+                            placeat. Eaque voluptates nemo iste perspiciatis ullam est et debitis. Dolore cumque et sit
+                            labore necessitatibus corporis dolores praesentium. Cumque maxime quo iste quis dignissimos
+                            et sit doloremque.
                         </CardContent>
                     </Card>
                 )}

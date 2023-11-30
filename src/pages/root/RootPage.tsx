@@ -61,7 +61,7 @@ export default function RootPage() {
                                 >
                                     <MenuItem onClick={() => {
                                         setAnchorEl(null)
-                                        navigate("/profile");
+                                        navigate(`profile/1`);
                                     }}>Profile</MenuItem>
                                     <MenuItem onClick={() => {
                                         setAnchorEl(null)
