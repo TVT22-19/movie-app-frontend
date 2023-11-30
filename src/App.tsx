@@ -2,8 +2,7 @@ import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} fr
 import RootPage from "./pages/root/RootPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
-import GroupPage from "./pages/GroupPage.tsx";
-import GroupCreationPage from "./pages/GroupCreationPage.tsx";
+import GroupPage from "./pages/group/GroupPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
 import {AuthProvider, useAuth} from "./hooks/useAuth.tsx";
@@ -28,8 +27,7 @@ export default function App() {
 
                                     <Route path="profile/:id" element={<ProfilePage/>}/>
 
-                                    <Route path="group" element={<GroupPage/>}/>
-                                    <Route path="creategroup" element={<GroupCreationPage/>}/>
+                                    <Route path="group/:id" element={<GroupPage/>}/>
 
                                     <Route path="*" element={<NotFoundPage/>}/>
                                </Route>
