@@ -14,6 +14,7 @@ import {
 import {Check, Close, Group} from "@mui/icons-material";
 import {useGroupInvites, useGroups} from "../../../services/groups.ts";
 import {useAuth} from "../../../hooks/useAuth.tsx";
+import {useNavigate} from "react-router-dom";
 
 export default function Sidebar() {
 
@@ -23,6 +24,8 @@ export default function Sidebar() {
 
     const {data: groups} = useGroups(isAuthorized)
     const {data: groupInvites} = useGroupInvites(isAuthorized)
+
+    const navigate = useNavigate()
 
     return (
         <Drawer variant="permanent" anchor="right" sx={{
@@ -58,7 +61,7 @@ export default function Sidebar() {
                             <Divider/>
                             {groups?.map(group => (
                                 <ListItem key={group.id} disablePadding>
-                                    <ListItemButton>
+                                    <ListItemButton onClick={() => navigate(`group/${group.id}`)}>
                                         <ListItemIcon>
                                             <Group/>
                                         </ListItemIcon>
