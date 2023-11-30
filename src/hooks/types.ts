@@ -7,7 +7,6 @@ export interface AuthContent {
 }
 
 export interface AuthProviderProps {
-    userToken: string,
     children: ReactNode
 }
 

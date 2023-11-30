@@ -13,12 +13,10 @@ import ProfilePage from "./pages/profile/ProfilePage.tsx";
 
 export default function App() {
 
-    const token = useAuth().getToken()
-
     return (
         <ThemeSwitchProvider>
             <QueryClientProvider client={new QueryClient()}>
-                <AuthProvider userToken={token || ""}>
+                <AuthProvider>
                     <RouterProvider router={
                         createBrowserRouter(
                             createRoutesFromElements(
