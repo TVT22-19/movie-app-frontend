@@ -4,24 +4,19 @@ import {
     Box,
     Button,
     CssBaseline,
-    Drawer,
     IconButton,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
     Menu,
     MenuItem,
     Toolbar,
     Typography,
     useTheme
 } from "@mui/material";
-import {AccountCircle, DarkMode, Group, LightMode} from "@mui/icons-material";
+import {AccountCircle, DarkMode, LightMode} from "@mui/icons-material";
 import {useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
 import {useThemeSwitch} from "../../hooks/useThemeSwitch.tsx";
 import {StyledField} from "./components/StyledField.tsx";
+import Sidebar from "./components/Sidebar.tsx";
 
 export default function RootPage() {
 
@@ -33,15 +28,6 @@ export default function RootPage() {
     const {isAuthorized, setToken} = useAuth()
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-    const drawerWidth = 240;
-
-    const dumpGroups = [
-        "Group 1",
-        "Group 2",
-        "Group 3",
-        "Group 4",
-    ]
 
     return (
         <Box sx={{display: 'flex'}}>
@@ -75,7 +61,7 @@ export default function RootPage() {
                                 >
                                     <MenuItem onClick={() => {
                                         setAnchorEl(null)
-                                        navigate("/profile");
+                                        navigate(`profile/1`);
                                     }}>Profile</MenuItem>
                                     <MenuItem onClick={() => {
                                         setAnchorEl(null)
@@ -88,29 +74,7 @@ export default function RootPage() {
                     </Box>
                 </Toolbar>
             </AppBar>
-            <Drawer variant="permanent" anchor="right" sx={{
-                flexShrink: 0,
-                [`& .MuiDrawer-paper`]: {
-                    width: drawerWidth,
-                    boxSizing: 'border-box'
-                },
-            }}>
-                <Toolbar/>
-                <Box sx={{overflow: 'auto'}}>
-                    <List>
-                        {dumpGroups.map((text) => (
-                            <ListItem key={text} disablePadding>
-                                <ListItemButton>
-                                    <ListItemIcon>
-                                        <Group/>
-                                    </ListItemIcon>
-                                    <ListItemText primary={text}/>
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
-                    </List>
-                </Box>
-            </Drawer>
+            <Sidebar/>
             <Box component="main" sx={{flexGrow: 1, padding: 4, paddingRight: 34}}>
                 <Toolbar/>
                 <Outlet/>

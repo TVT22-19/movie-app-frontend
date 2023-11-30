@@ -12,7 +12,7 @@ const AuthContext = createContext<AuthContent>({
 
 export const AuthProvider = (props: AuthProviderProps) => {
 
-    const [_token, _setToken] = useState(props.userToken);
+    const [_token, _setToken] = useState(localStorage.getItem("token") || "");
 
     const isAuthorized = !(!getToken() || getToken() === "");
 
