@@ -20,7 +20,7 @@ export default function GroupPage() {
     const [groupNotFound, setGroupNotFound] = useState(false);
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<GroupData | null>(null);
-    const [membersData, setMembersData] = useState(null);
+    const [membersData, setMembersData] = useState<number[] | null>(null);
 
     const { isAuthorized } = useAuth()
 
@@ -44,6 +44,25 @@ export default function GroupPage() {
         }
 
     ];
+
+    const dummyposts = [
+        {
+            timestamp: "time",
+            title: 'Message to all',
+            user_id: 1,
+            group_id: 1,
+            content: 'Bob sux'
+        },
+        {
+            timestamp: "stamp",
+            title: 'Message to John',
+            user_id: 2,
+            group_id: 1,
+            content: 'no u'
+        }
+
+
+    ]
 
     useEffect(() => {
         console.log('groupid: ', groupId);
@@ -70,30 +89,25 @@ export default function GroupPage() {
             });
     }, [groupId]);
 
-    useEffect(() => {
-        console.log('groupid: ', groupId);
 
+    useEffect(() => {
+        // Fetch members data
         fetch(`http://localhost:3001/group/members/${groupId}`)
             .then((response) => {
-                if (response.status === 404) {
-                    setGroupNotFound(true);
-                    setLoading(false);
-                    return null; 
+                if (!response.ok) {
+                    console.error('Error fetching group members data:', response.statusText);
+                    return [];
                 }
                 return response.json();
             })
-            .then((fetchedData) => {
-                if (fetchedData !== null) {
-                    setMembersData(fetchedData);
-                    setLoading(false);
-                    console.log('Fetched data:', fetchedData);
-                }
+            .then((members) => {
+                setMembersData(members);
             })
             .catch((error) => {
-                console.error('Error fetching group members:', error);
-                setLoading(false);//
+                console.error('Error fetching group members data:', error);
             });
     }, [groupId]);
+
 
 
 
@@ -121,16 +135,12 @@ export default function GroupPage() {
                         data ? <h2>{data.name}</h2> : <div>Loading...</div>
                     } />
                     <CardContent>
-                        {data ? (
-                            <>{data.description}</>
-                        ) : (
-                            <div>Loading...</div> //kind of useless but this avoids the data might be null warning.
-                        )}
-                        
+                        {data?.description ?? <div>Loading...</div>}
+
                     </CardContent>
                 </Card>
 
-                <Typography variant="h4">Members: {membersData /*test*/}</Typography> 
+                <Typography variant="h5">Members:</Typography>
 
                 <Grid container>
                     {members.map((member) => (
@@ -139,7 +149,7 @@ export default function GroupPage() {
                                 <CardContent>
                                     <Stack spacing={2} direction="row" style={{ alignItems: 'center' }}>
                                         <Avatar src={member.avatar} alt={member.username} />
-                                        <Typography variant="subtitle2">{member.username}</Typography>
+                                        <Typography>{membersData && membersData.join(', ')}</Typography>
                                     </Stack>
                                 </CardContent>
                             </Card>
@@ -147,15 +157,21 @@ export default function GroupPage() {
                     ))}
                 </Grid>
 
-                <Typography variant="h4">Discussion</Typography>
+                <Typography variant="h5">Discussion</Typography>
+                <Stack spacing={2}>
+                    {dummyposts.map((member) => (
+                        <Card key={member.timestamp}>
+                            <CardContent>
+                                <Typography variant="subtitle1"><b>{member.title}</b></Typography>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}><Typography style={{ fontSize: '0.8rem' }}>{member.user_id} &bull; {member.timestamp} </Typography></div>
+                                <Typography variant="body2">{member.content}</Typography>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </Stack>
 
-                <Card>
-                    <CardContent>
-                        <Typography>Discussion...</Typography>
-                    </CardContent>
-                </Card>
 
-                <Typography variant="h4">News</Typography>
+                <Typography variant="h5">News</Typography>
 
                 <Stack spacing={2}>
                     {news.map((member) => (
