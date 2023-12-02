@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Card, CardContent, CardHeader, Fab, Stack, Typography } from "@mui/material";
+import { Avatar, Card, CardContent, CardHeader, Fab, Stack, Typography, Button } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { GroupAdd, Groups as GroupIcon } from "@mui/icons-material";
 import { blue } from "@mui/material/colors";
 import { useAuth } from "../../hooks/useAuth.tsx";
 import { Navigate, useParams } from "react-router-dom";
 import GroupCreationDialog from "./dialog/GroupCreationDialog.tsx";
+import PostCreationDialog from "./dialog/PostCreationDialog.tsx";
 
 export default function GroupPage() {
   const { isAuthorized } = useAuth();
   const [openCreateGroupDialog, setOpenCreateGroupDialog] = useState(false);
+  const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
   const [groupNotFound, setGroupNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<GroupData | null>(null);
@@ -74,6 +76,7 @@ export default function GroupPage() {
   return (
     <>
       <GroupCreationDialog open={openCreateGroupDialog} setOpen={setOpenCreateGroupDialog} />
+      <PostCreationDialog open={openCreatePostDialog} setOpen={setOpenCreatePostDialog} />
       <Stack spacing={2}>
         <Card>
           <CardHeader
@@ -108,6 +111,7 @@ export default function GroupPage() {
         </Grid>
 
         <Typography variant="h5">Discussion</Typography>
+        
         <Stack spacing={2}>
           {dummyposts.map((member) => (
             <Card key={member.timestamp}>
@@ -122,6 +126,7 @@ export default function GroupPage() {
               </CardContent>
             </Card>
           ))}
+          <Button onClick={() => setOpenCreatePostDialog(true)}> Create discussion post </Button>
         </Stack>
 
         <Typography variant="h5">News</Typography>
