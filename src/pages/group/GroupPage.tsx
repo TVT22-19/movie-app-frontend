@@ -1,195 +1,188 @@
+import React, { useEffect, useState } from "react";
 import { Avatar, Card, CardContent, CardHeader, Fab, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { GroupAdd, Groups as GroupIcon } from "@mui/icons-material";
-import { blue } from '@mui/material/colors';
+import { blue } from "@mui/material/colors";
 import { useAuth } from "../../hooks/useAuth.tsx";
-import { useState, useEffect } from "react";
-import GroupCreationDialog from "./dialog/GroupCreationDialog.tsx";
 import { Navigate, useParams } from "react-router-dom";
+import GroupCreationDialog from "./dialog/GroupCreationDialog.tsx";
 
 export default function GroupPage() {
+  const { isAuthorized } = useAuth();
+  const [openCreateGroupDialog, setOpenCreateGroupDialog] = useState(false);
+  const [groupNotFound, setGroupNotFound] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<GroupData | null>(null);
+  const [membersData, setMembersData] = useState<Member[]>([]);
 
-    const [openCreateGroupDialog, setOpenCreateGroupDialog] = useState(false);
+  const groupId = Number(useParams().id);
 
-    interface GroupData {
-        name: string;
-        description: string;
-        avatar_url: string;
-    }
+  //get group name and description
+  useEffect(() => {
+    console.log("groupid: ", groupId);
 
-    const [groupNotFound, setGroupNotFound] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [data, setData] = useState<GroupData | null>(null);
-    const [membersData, setMembersData] = useState<number[] | null>(null);
-
-    const { isAuthorized } = useAuth()
-
-    const groupId = Number(useParams().id)
-    if (Number.isNaN(groupId)) return <Navigate to="/page-not-found" />
-
-
-    const members = [
-        {
-            id: 1,
-            username: 'User1',
-            avatar: ''
+    fetch(`http://localhost:3001/group/${groupId}`)
+      .then((response) => {
+        if (response.status === 404) {
+          setGroupNotFound(true);
+          setLoading(false);
+          return null;
         }
-    ]
-
-    const news = [
-        {
-            id: 1,
-            title: 'Title',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua'
+        return response.json();
+      })
+      .then((fetchedData) => {
+        if (fetchedData !== null) {
+          setData(fetchedData);
+          setLoading(false);
+          console.log("Fetched data:", fetchedData);
         }
+      })
+      .catch((error) => {
+        console.error("Error fetching group data:", error);
+        setLoading(false);
+      });
+  }, [groupId]);
 
-    ];
-
-    const dummyposts = [
-        {
-            timestamp: "time",
-            title: 'Message to all',
-            user_id: 1,
-            group_id: 1,
-            content: 'Bob sux'
-        },
-        {
-            timestamp: "stamp",
-            title: 'Message to John',
-            user_id: 2,
-            group_id: 1,
-            content: 'no u'
+  //get group members
+  useEffect(() => {
+    fetch(`http://localhost:3001/group/members/${groupId}`)
+      .then((response) => {
+        if (!response.ok) {
+          console.error("Error fetching group members data:", response.statusText);
+          return [];
         }
+        return response.json();
+      })
+      .then((members) => {
+        setMembersData(members);
+        console.log("Group members: ", members);
+      })
+      .catch((error) => {
+        console.error("Error fetching group members data:", error);
+      });
+  }, [groupId]);
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-    ]
+  if (groupNotFound) {
+    console.log("Group not found");
+    return <Navigate to="/page-not-found" />;
+  }
 
-    useEffect(() => {
-        console.log('groupid: ', groupId);
+  return (
+    <>
+      <GroupCreationDialog open={openCreateGroupDialog} setOpen={setOpenCreateGroupDialog} />
+      <Stack spacing={2}>
+        <Card>
+          <CardHeader
+            avatar={
+              <Avatar sx={{ bgcolor: blue[500], width: 56, height: 56 }}>
+                <GroupIcon />
+              </Avatar>
+            }
+            title={data ? <h2>{data.name}</h2> : <div>Loading...</div>}
+          />
+          <CardContent>{data?.description ?? <div>Loading...</div>}</CardContent>
+        </Card>
 
-        fetch(`http://localhost:3001/group/${groupId}`)
-            .then((response) => {
-                if (response.status === 404) {
-                    setGroupNotFound(true);
-                    setLoading(false);
-                    return null; // Returning null to stop the promise chain
-                }
-                return response.json();
-            })
-            .then((fetchedData) => {
-                if (fetchedData !== null) {
-                    setData(fetchedData);
-                    setLoading(false);
-                    console.log('Fetched data:', fetchedData);
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching group data:', error);
-                setLoading(false);//
-            });
-    }, [groupId]);
-
-
-    useEffect(() => {
-        // Fetch members data
-        fetch(`http://localhost:3001/group/members/${groupId}`)
-            .then((response) => {
-                if (!response.ok) {
-                    console.error('Error fetching group members data:', response.statusText);
-                    return [];
-                }
-                return response.json();
-            })
-            .then((members) => {
-                setMembersData(members);
-            })
-            .catch((error) => {
-                console.error('Error fetching group members data:', error);
-            });
-    }, [groupId]);
-
-
-
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-
-    if (groupNotFound) {
-        console.log('Group not found');
-        return <Navigate to="/page-not-found" />;
-    }
-
-
-    return (
-        <>
-            <GroupCreationDialog open={openCreateGroupDialog} setOpen={setOpenCreateGroupDialog} />
-            <Stack spacing={2}>
+        <Typography variant="h5">Members:</Typography>
+        <Grid container>
+          {membersData ? (
+            membersData.map((member) => (
+              <Grid key={member.id} paddingRight={2} paddingBottom={2}>
                 <Card>
-                    <CardHeader avatar={
-                        <Avatar sx={{ bgcolor: blue[500], width: 56, height: 56 }}>
-                            <GroupIcon />
-                        </Avatar>
-                    } title={
-                        data ? <h2>{data.name}</h2> : <div>Loading...</div>
-                    } />
-                    <CardContent>
-                        {data?.description ?? <div>Loading...</div>}
-
-                    </CardContent>
+                  <CardContent>
+                    <Stack spacing={2} direction="row" style={{ alignItems: "center" }}>
+                      <Avatar src={member.avatar} alt={member.username} />
+                      <Typography>{member.username}</Typography>
+                    </Stack>
+                  </CardContent>
                 </Card>
+              </Grid>
+            ))
+          ) : (
+            <Typography>No members found</Typography>
+          )}
+        </Grid>
 
-                <Typography variant="h5">Members:</Typography>
+        <Typography variant="h5">Discussion</Typography>
+        <Stack spacing={2}>
+          {dummyposts.map((member) => (
+            <Card key={member.timestamp}>
+              <CardContent>
+                <Typography variant="subtitle1">
+                  <b>{member.title}</b>
+                </Typography>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography style={{ fontSize: "0.8rem" }}>{member.user_id} &bull; {member.timestamp} </Typography>
+                </div>
+                <Typography variant="body2">{member.content}</Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Stack>
 
-                <Grid container>
-                    {members.map((member) => (
-                        <Grid key={member.id} paddingRight={2} paddingBottom={2}>
-                            <Card>
-                                <CardContent>
-                                    <Stack spacing={2} direction="row" style={{ alignItems: 'center' }}>
-                                        <Avatar src={member.avatar} alt={member.username} />
-                                        <Typography>{membersData && membersData.join(', ')}</Typography>
-                                    </Stack>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
+        <Typography variant="h5">News</Typography>
+        <Stack spacing={2}>
+          {news.map((member) => (
+            <Card key={member.id}>
+              <CardContent>
+                <Typography variant="h5">{member.id}. {member.title}</Typography>
+                <Typography variant="subtitle2">{member.content}</Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Stack>
 
-                <Typography variant="h5">Discussion</Typography>
-                <Stack spacing={2}>
-                    {dummyposts.map((member) => (
-                        <Card key={member.timestamp}>
-                            <CardContent>
-                                <Typography variant="subtitle1"><b>{member.title}</b></Typography>
-                                <div style={{ display: 'flex', justifyContent: 'space-between' }}><Typography style={{ fontSize: '0.8rem' }}>{member.user_id} &bull; {member.timestamp} </Typography></div>
-                                <Typography variant="body2">{member.content}</Typography>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </Stack>
-
-
-                <Typography variant="h5">News</Typography>
-
-                <Stack spacing={2}>
-                    {news.map((member) => (
-                        <Card key={member.id}>
-                            <CardContent>
-                                <Typography variant="h5">{member.id}. {member.title}</Typography>
-                                <Typography variant="subtitle2">{member.content}</Typography>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </Stack>
-
-                {isAuthorized &&
-                    <Fab color="primary" sx={{ position: 'fixed', bottom: 16, right: 16 + 240 }}
-                        onClick={() => setOpenCreateGroupDialog(true)}>
-                        <GroupAdd />
-                    </Fab>}
-            </Stack>
-        </>
-    );
+        {isAuthorized && (
+          <Fab
+            color="primary"
+            sx={{ position: "fixed", bottom: 16, right: 16 + 240 }}
+            onClick={() => setOpenCreateGroupDialog(true)}
+          >
+            <GroupAdd />
+          </Fab>
+        )}
+      </Stack>
+    </>
+  );
 }
+
+interface GroupData {
+  name: string;
+  description: string;
+  avatar_url: string;
+}
+
+interface Member {
+  id: number;
+  username: string;
+  avatar: string;
+}
+
+const news = [
+  {
+    id: 1,
+    title: "Title",
+    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+  },
+];
+
+const dummyposts = [
+  {
+    timestamp: "time",
+    title: "Message to all",
+    user_id: 1,
+    group_id: 1,
+    content: "Bob sux",
+  },
+  {
+    timestamp: "stamp",
+    title: "Message to John",
+    user_id: 2,
+    group_id: 1,
+    content: "no u",
+  },
+];
