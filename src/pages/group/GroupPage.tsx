@@ -16,8 +16,25 @@ export default function GroupPage() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<GroupData | null>(null);
   const [membersData, setMembersData] = useState<Member[]>([]);
+  const [isOwner, setIsOwner] = useState(true); // change to false when api check implemented..
+  const [isMember, setIsMember] = useState(true); //testing
+
 
   const groupId = Number(useParams().id);
+
+  useEffect(() => {
+    // fetch group membership and owner status
+    fetch(`/group/checkifmember...`, {
+      //^ not implemented yet
+
+    })
+      .then(response => response.json())
+      .then(data => {
+        setIsMember(data.isMember);
+        setIsOwner(data.isOwner);
+      })
+      .catch(error => console.error('Error fetching membership:', error));
+  }, []);
 
   //get group name and description
   useEffect(() => {
@@ -110,36 +127,46 @@ export default function GroupPage() {
           )}
         </Grid>
 
-        <Typography variant="h5">Discussion</Typography>
-        
-        <Stack spacing={2}>
-          {dummyposts.map((member) => (
-            <Card key={member.timestamp}>
-              <CardContent>
-                <Typography variant="subtitle1">
-                  <b>{member.title}</b>
-                </Typography>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography style={{ fontSize: "0.8rem" }}>{member.user_id} &bull; {member.timestamp} </Typography>
-                </div>
-                <Typography variant="body2">{member.content}</Typography>
-              </CardContent>
-            </Card>
-          ))}
-          <Button onClick={() => setOpenCreatePostDialog(true)}> Create discussion post </Button>
-        </Stack>
+        {(isMember) && (
+          <div>
 
-        <Typography variant="h5">News</Typography>
-        <Stack spacing={2}>
-          {news.map((member) => (
-            <Card key={member.id}>
-              <CardContent>
-                <Typography variant="h5">{member.id}. {member.title}</Typography>
-                <Typography variant="subtitle2">{member.content}</Typography>
-              </CardContent>
-            </Card>
-          ))}
-        </Stack>
+            <Typography variant="h5">Discussion</Typography>
+
+            <Stack spacing={2}>
+              {dummyposts.map((member) => (
+                <Card key={member.timestamp}>
+                  <CardContent>
+                    <Typography variant="subtitle1">
+                      <b>{member.title}</b>
+                    </Typography>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <Typography style={{ fontSize: "0.8rem" }}>{member.user_id} &bull; {member.timestamp} </Typography>
+                    </div>
+                    <Typography variant="body2">{member.content}</Typography>
+                  </CardContent>
+                </Card>
+              ))}
+              <Button onClick={() => setOpenCreatePostDialog(true)}> Create discussion post </Button>
+            </Stack>
+
+            <Typography variant="h5">News</Typography>
+            <Stack spacing={2}>
+              {news.map((member) => (
+                <Card key={member.id}>
+                  <CardContent>
+                    <Typography variant="h5">{member.id}. {member.title}</Typography>
+                    <Typography variant="subtitle2">{member.content}</Typography>
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          </div>
+        )}
+
+        {(!isMember) && (
+          <Button > Request to join this group </Button>
+        )}
+
 
         {isAuthorized && (
           <Fab
