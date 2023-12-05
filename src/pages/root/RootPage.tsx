@@ -19,6 +19,7 @@ import {useAuth} from "../../hooks/useAuth.tsx";
 import {useThemeSwitch} from "../../hooks/useThemeSwitch.tsx";
 import {StyledField} from "./components/StyledField.tsx";
 import Sidebar from "./components/Sidebar.tsx";
+import GroupCreationDialog from "./dialog/GroupCreationDialog.tsx";
 
 export default function RootPage() {
 
@@ -31,8 +32,11 @@ export default function RootPage() {
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+    const [openGroupCreateDialog, setOpenGroupCreateDialog] = useState(false)
+
     return (
         <Box sx={{display: 'flex'}}>
+            <GroupCreationDialog open={openGroupCreateDialog} setOpen={setOpenGroupCreateDialog}/>
             <CssBaseline/>
             <AppBar position="fixed" sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
                 <Toolbar>
@@ -71,7 +75,8 @@ export default function RootPage() {
                                         <ListItemText>Profile</ListItemText>
                                     </MenuItem>
                                     <MenuItem onClick={() => {
-                                        // TODO Open Group Creating Dialog
+                                        setAnchorEl(null)
+                                        setOpenGroupCreateDialog(true)
                                     }}>
                                         <ListItemIcon>
                                             <Add fontSize="small"/>
