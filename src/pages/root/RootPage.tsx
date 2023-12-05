@@ -5,13 +5,15 @@ import {
     Button,
     CssBaseline,
     IconButton,
+    ListItemIcon,
+    ListItemText,
     Menu,
     MenuItem,
     Toolbar,
     Typography,
     useTheme
 } from "@mui/material";
-import {AccountCircle, DarkMode, LightMode} from "@mui/icons-material";
+import {AccountCircle, Add, DarkMode, LightMode, Logout, People} from "@mui/icons-material";
 import {useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
 import {useThemeSwitch} from "../../hooks/useThemeSwitch.tsx";
@@ -62,12 +64,30 @@ export default function RootPage() {
                                     <MenuItem onClick={() => {
                                         setAnchorEl(null)
                                         navigate(`profile/1`);
-                                    }}>Profile</MenuItem>
+                                    }}>
+                                        <ListItemIcon>
+                                            <People fontSize="small"/>
+                                        </ListItemIcon>
+                                        <ListItemText>Profile</ListItemText>
+                                    </MenuItem>
+                                    <MenuItem onClick={() => {
+                                        // TODO Open Group Creating Dialog
+                                    }}>
+                                        <ListItemIcon>
+                                            <Add fontSize="small"/>
+                                        </ListItemIcon>
+                                        <ListItemText> Create group</ListItemText>
+                                    </MenuItem>
                                     <MenuItem onClick={() => {
                                         setAnchorEl(null)
                                         setToken("")
                                         console.log("Have a nice day :)")
-                                    }}>Logout</MenuItem>
+                                    }}>
+                                        <ListItemIcon>
+                                            <Logout fontSize="small"/>
+                                        </ListItemIcon>
+                                        <ListItemText>Logout</ListItemText>
+                                    </MenuItem>
                                 </Menu>
                             </>
                             : <Button color="inherit" component={Link} to="login">Login</Button>}
