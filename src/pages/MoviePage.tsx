@@ -1,5 +1,16 @@
 import {Navigate, useParams} from "react-router-dom";
-import {Card, CardContent, Divider, Rating, Stack, TextField, Typography} from "@mui/material";
+import {
+    Card,
+    CardContent,
+    Divider,
+    FormControl,
+    InputAdornment,
+    InputLabel,
+    OutlinedInput,
+    Rating,
+    Stack,
+    Typography
+} from "@mui/material";
 import {useAuth} from "../hooks/useAuth.tsx";
 
 export default function MoviePage() {
@@ -31,12 +42,22 @@ export default function MoviePage() {
 
             <Divider/>
 
-            {isAuthorized && <TextField label="Comment" variant="outlined"/>}
+            {isAuthorized && <FormControl variant="outlined">
+                <InputLabel>Comment</InputLabel>
+                <OutlinedInput endAdornment={
+                    <InputAdornment position="end">
+                        <Rating/>
+                    </InputAdornment>
+                } label="Comment"/>
+            </FormControl>}
 
             {[1, 2, 3].map(value => (
                 <Card>
                     <CardContent>
-                        <Typography variant="h6">{value}. Spider-man Across The JavaScript</Typography>
+                        <Stack direction="row">
+                            <Typography flexGrow={1} variant="h6">{value}. Spider-man Across The JavaScript</Typography>
+                            <Rating value={Math.random() * (5 - 1) + 1}/>
+                        </Stack>
                         <Typography variant="body2">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
                             blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur, neque
                             doloribus.</Typography>
