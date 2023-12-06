@@ -5,6 +5,8 @@ import LoginPage from "./pages/LoginPage.tsx";
 import GroupPage from "./pages/group/GroupPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
+import BrowseGroupsPage from "./pages/BrowseGroupsPage.tsx";
+
 import {AuthProvider} from "./hooks/useAuth.tsx";
 import {ThemeSwitchProvider} from "./hooks/useThemeSwitch.tsx";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
@@ -28,6 +30,8 @@ export default function App() {
                                     <Route path="profile/:id" element={<ProfilePage/>}/>
 
                                     <Route path="group/:id" element={<GroupPage/>}/>
+                                    <Route path="browsegroups" element={<BrowseGroupsPage/>}/>
+
 
                                     <Route path="*" element={<NotFoundPage/>}/>
                                 </Route>

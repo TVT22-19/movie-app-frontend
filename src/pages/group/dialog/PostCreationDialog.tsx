@@ -20,7 +20,7 @@ export default function PostCreationDialog(props: CreatePostDialogProps & { hand
             console.log("Some required fields are empty")
             return;
         }
-        props.handleCreatePost(postTitle, /*userID, groupID,*/ postContent);
+        props.handleCreatePost(postTitle, postContent);
 
         props.setOpen(false)
 
