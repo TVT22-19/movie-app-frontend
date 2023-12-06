@@ -8,7 +8,7 @@ export interface Post {
     content: string
 }
 
-export default function PostCreationDialog(props: CreatePostDialogProps) {
+export default function PostCreationDialog(props: CreatePostDialogProps & { handleCreatePost: Function }) {
 
     const [postTitle, setPostTitle] = useState<string>("")
     const [postContent, setPostContent] = useState<string>("")
@@ -18,8 +18,9 @@ export default function PostCreationDialog(props: CreatePostDialogProps) {
 
         if (groupname.trim() === "" || groupdesc.trim() === "") {
             console.log("Some required fields are empty")
-            return
+            return;
         }
+        props.handleCreatePost(postTitle, /*userID, groupID,*/ postContent);
 
         props.setOpen(false)
 
@@ -42,7 +43,7 @@ export default function PostCreationDialog(props: CreatePostDialogProps) {
             <DialogActions>
                 <Button onClick={() => props.setOpen(false)}>Cancel</Button>
                 <Button autoFocus variant="contained"
-                        onClick={() => createPost(postTitle,postContent,)}>
+                        onClick={() => createPost(postTitle,postContent)}>
                     Create
                 </Button>
             </DialogActions>

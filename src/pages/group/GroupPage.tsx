@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Card, CardContent, CardHeader, Fab, Stack, Typography, Button } from "@mui/material";
+import {
+  Avatar, Card, CardContent, CardHeader, Fab, Stack, Typography, Button, IconButton, Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+
+} from "@mui/material";
+import CancelIcon from '@mui/icons-material/Cancel';
 import Grid from "@mui/material/Unstable_Grid2";
 import { GroupAdd, Groups as GroupIcon } from "@mui/icons-material";
 import { blue } from "@mui/material/colors";
@@ -7,22 +14,96 @@ import { useAuth } from "../../hooks/useAuth.tsx";
 import { Navigate, useParams } from "react-router-dom";
 import GroupCreationDialog from "./dialog/GroupCreationDialog.tsx";
 import PostCreationDialog from "./dialog/PostCreationDialog.tsx";
+import { User } from "../../services/types";
 
 export default function GroupPage() {
-  const { isAuthorized } = useAuth();
+  const { isAuthorized, getToken } = useAuth();
   const [openCreateGroupDialog, setOpenCreateGroupDialog] = useState(false);
   const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
   const [groupNotFound, setGroupNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<GroupData | null>(null);
   const [membersData, setMembersData] = useState<Member[]>([]);
-  const [isOwner, setIsOwner] = useState(true); // change to false when api check implemented..
+  const [isOwner, setIsOwner] = useState(true); // testing 
   const [isMember, setIsMember] = useState(true); //testing
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [posts, setPosts] = useState([]);
 
 
   const groupId = Number(useParams().id);
 
+
+  const handleRemoveClick = (userId: number) => {
+    setSelectedUserId(userId);
+    setOpenDialog(true);
+  };
+
+  const handleRemoveConfirm = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/group/deletemember/${selectedUserId}/from/${groupId}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        console.log('Member removed successfully');
+      } else {
+        console.error('Failed to remove member');
+        //show error to user?
+      }
+    } catch (error) {
+      console.error('Error removing member:', error);
+      //show error to user?
+      
+    } finally {
+      setOpenDialog(false);
+      fetchMembers();
+    }
+  };
+
+  const handleRemoveCancel = () => {
+    setOpenDialog(false);
+  };
+
+  const fetchDiscussionPosts = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/group-post/${groupId}`)
+      const data = await response.json();
+      setPosts(data);
+      console.log(data);
+    } catch (error) {
+      console.error('Error fetching data from the backend', error);
+    }
+  };
+  
+  const fetchMembers = async () => {
+    fetch(`http://localhost:3001/group/members/${groupId}`)
+    .then((response) => {
+      if (!response.ok) {
+        console.error("Error fetching group members data:", response.statusText);
+        return [];
+      }
+      return response.json();
+    })
+    .then((members) => {
+      setMembersData(members);
+      console.log("Group members: ", members);
+    })
+    .catch((error) => {
+      console.error("Error fetching group members data:", error);
+    });
+
+  };
+
+  // CHECKING MEMBERSHIP
   useEffect(() => {
+
+    let user: User | null = null;
+    const token = getToken();
+    if (token) {
+      //user = JSON.parse(atob(token.split('.')[1])); //no real token yet so this isn't working
+    }
+    console.log(user);
     // fetch group membership and owner status
     fetch(`/group/checkifmember...`, {
       //^ not implemented yet
@@ -31,7 +112,6 @@ export default function GroupPage() {
       .then(response => response.json())
       .then(data => {
         setIsMember(data.isMember);
-        setIsOwner(data.isOwner);
       })
       .catch(error => console.error('Error fetching membership:', error));
   }, []);
@@ -64,22 +144,38 @@ export default function GroupPage() {
 
   //get group members
   useEffect(() => {
-    fetch(`http://localhost:3001/group/members/${groupId}`)
-      .then((response) => {
-        if (!response.ok) {
-          console.error("Error fetching group members data:", response.statusText);
-          return [];
-        }
-        return response.json();
-      })
-      .then((members) => {
-        setMembersData(members);
-        console.log("Group members: ", members);
-      })
-      .catch((error) => {
-        console.error("Error fetching group members data:", error);
-      });
+    fetchMembers();
   }, [groupId]);
+
+  
+  //GET DISCUSSION POSTS
+  useEffect(() => {
+
+    fetchDiscussionPosts();
+  }, [groupId]);
+
+  //CREATE DISCUSSION POST
+  const handleCreatePost = async (title: string, content: string) => {
+    try {
+      console.log(title, content);
+      let userID = 1; // FOR NOW - fix once jwt available
+      console.log(userID, ' ', groupId);
+
+      const response = await fetch('http://localhost:3001/group-post/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, userID, groupID: groupId, content })
+      });
+
+      const responseData = await response.json();
+      fetchDiscussionPosts();
+      console.log(responseData);
+    } catch (error) {
+      console.error('Error creating post', error);
+    }
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -93,7 +189,11 @@ export default function GroupPage() {
   return (
     <>
       <GroupCreationDialog open={openCreateGroupDialog} setOpen={setOpenCreateGroupDialog} />
-      <PostCreationDialog open={openCreatePostDialog} setOpen={setOpenCreatePostDialog} />
+      <PostCreationDialog
+        open={openCreatePostDialog}
+        setOpen={setOpenCreatePostDialog}
+        handleCreatePost={handleCreatePost}
+      />
       <Stack spacing={2}>
         <Card>
           <CardHeader
@@ -106,7 +206,6 @@ export default function GroupPage() {
           />
           <CardContent>{data?.description ?? <div>Loading...</div>}</CardContent>
         </Card>
-
         <Typography variant="h5">Members:</Typography>
         <Grid container>
           {membersData ? (
@@ -117,6 +216,11 @@ export default function GroupPage() {
                     <Stack spacing={2} direction="row" style={{ alignItems: "center" }}>
                       <Avatar src={member.avatar} alt={member.username} />
                       <Typography>{member.username}</Typography>
+                      {isOwner && (
+                        <IconButton color="error" onClick={() => handleRemoveClick(member.id)}>
+                          <CancelIcon />
+                        </IconButton>
+                      )}
                     </Stack>
                   </CardContent>
                 </Card>
@@ -132,8 +236,9 @@ export default function GroupPage() {
 
             <Typography variant="h5">Discussion</Typography>
 
+         {/*fix type issue*/}
             <Stack spacing={2}>
-              {dummyposts.map((member) => (
+              {posts.map((member) => (
                 <Card key={member.timestamp}>
                   <CardContent>
                     <Typography variant="subtitle1">
@@ -149,17 +254,6 @@ export default function GroupPage() {
               <Button onClick={() => setOpenCreatePostDialog(true)}> Create discussion post </Button>
             </Stack>
 
-            <Typography variant="h5">News</Typography>
-            <Stack spacing={2}>
-              {news.map((member) => (
-                <Card key={member.id}>
-                  <CardContent>
-                    <Typography variant="h5">{member.id}. {member.title}</Typography>
-                    <Typography variant="subtitle2">{member.content}</Typography>
-                  </CardContent>
-                </Card>
-              ))}
-            </Stack>
           </div>
         )}
 
@@ -178,6 +272,19 @@ export default function GroupPage() {
           </Fab>
         )}
       </Stack>
+
+      <Dialog open={openDialog} onClose={handleRemoveCancel}>
+        {/*currently shows only id oops*/}
+        <DialogTitle>{`Remove user with id: ${selectedUserId} from the group?`}</DialogTitle>
+        <DialogActions>
+          <Button onClick={handleRemoveCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleRemoveConfirm} color="error">
+            Remove
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
@@ -194,27 +301,4 @@ interface Member {
   avatar: string;
 }
 
-const news = [
-  {
-    id: 1,
-    title: "Title",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-  },
-];
 
-const dummyposts = [
-  {
-    timestamp: "time",
-    title: "Message to all",
-    user_id: 1,
-    group_id: 1,
-    content: "Bob sux",
-  },
-  {
-    timestamp: "stamp",
-    title: "Message to John",
-    user_id: 2,
-    group_id: 1,
-    content: "no u",
-  },
-];
