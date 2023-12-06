@@ -1,13 +1,10 @@
-import {Avatar, Card, CardContent, CardHeader, Fab, Stack, Typography} from "@mui/material";
+import {Avatar, Card, CardContent, CardHeader, Stack, Typography} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import {GroupAdd, Groups as GroupIcon} from "@mui/icons-material";
+import {Groups as GroupIcon} from "@mui/icons-material";
 import {blue} from '@mui/material/colors';
-import {useAuth} from "../../hooks/useAuth.tsx";
 import {Navigate, useParams} from "react-router-dom";
 
 export default function GroupPage() {
-
-    const {isAuthorized} = useAuth()
 
     const groupId = Number(useParams().id)
     if (Number.isNaN(groupId)) return <Navigate to="/page-not-found"/>
@@ -116,13 +113,6 @@ export default function GroupPage() {
                         </Card>
                     ))}
                 </Stack>
-
-                {isAuthorized &&
-                    <Fab color="primary" sx={{position: 'fixed', bottom: 16, right: 16 + 240}} onClick={() => {
-                        // TODO Open...
-                    }}>
-                        <GroupAdd/>
-                    </Fab>}
             </Stack>
         </>
     )
