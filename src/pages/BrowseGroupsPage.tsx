@@ -5,7 +5,7 @@ import {
 } from "@mui/material";
 
 export default function BrowseGroupsPage() {
-    const [groups, setGroups] = useState([]);
+    const [groups, setGroups] = useState<GroupData[]>([]);
     const theme = useTheme();
 
     useEffect(() => {
@@ -32,24 +32,37 @@ export default function BrowseGroupsPage() {
                 />
                 <CardContent>
                     <Stack spacing={2}>
-                        {groups.map((group) => (
-                            <Card key={group.id}>
-                                <CardHeader
-                                    avatar={<Avatar>{group.name.charAt(0)}</Avatar>}
-                                    title={
-                                        <Link
-                                        to={`/group/${group.id}`}
-                                        style={{ color: theme.palette.text.primary }}
-                                    >
-                                        {group.name}
-                                    </Link>
-                                    }
-                                />
-                            </Card>
-                        ))}
+                    {groups ? (
+        groups.map((group) => (
+            <Card key={group.id}>
+                <CardHeader
+                    avatar={<Avatar>{group.name.charAt(0)}</Avatar>}
+                    title={
+                        <Link
+                            to={`/group/${group.id}`}
+                            style={{ color: theme.palette.text.primary }}
+                        >
+                            {group.name}
+                        </Link>
+                    }
+                />
+            </Card>
+        ))
+    ) : (
+        <Typography variant="body2" color="textSecondary">
+            No groups available.
+        </Typography>
+    )}
                     </Stack>
                 </CardContent>
             </Card>
         </>
     );
 }
+
+interface GroupData {
+    id: number;
+    name: string;
+    description: string;
+    avatar_url: string;
+  }
