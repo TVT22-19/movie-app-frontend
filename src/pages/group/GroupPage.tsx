@@ -28,7 +28,7 @@ export default function GroupPage() {
   const [isMember, setIsMember] = useState(true); //testing
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<Post[]>([]);
 
 
   const groupId = Number(useParams().id);
@@ -150,8 +150,11 @@ export default function GroupPage() {
   
   //GET DISCUSSION POSTS
   useEffect(() => {
+    const fetchData = async () => {
+      await fetchDiscussionPosts();
+    };
 
-    fetchDiscussionPosts();
+    fetchData();
   }, [groupId]);
 
   //CREATE DISCUSSION POST
@@ -236,18 +239,18 @@ export default function GroupPage() {
 
             <Typography variant="h5">Discussion</Typography>
 
-         {/*fix type issue*/}
+         
             <Stack spacing={2}>
-              {posts.map((member) => (
-                <Card key={member.timestamp}>
+              {posts.map((post) => (
+                <Card key={new Date(post.timestamp).getTime()}>
                   <CardContent>
                     <Typography variant="subtitle1">
-                      <b>{member.title}</b>
+                      <u><b>{post.title}</b></u>
                     </Typography>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography style={{ fontSize: "0.8rem" }}>{member.user_id} &bull; {member.timestamp} </Typography>
+                      <Typography style={{ fontSize: "0.8rem" }}>{post.username} &bull; {new Date(post.timestamp).toLocaleString()} </Typography>
                     </div>
-                    <Typography variant="body2">{member.content}</Typography>
+                    <Typography variant="body2">{post.content}</Typography>
                   </CardContent>
                 </Card>
               ))}
@@ -299,6 +302,15 @@ interface Member {
   id: number;
   username: string;
   avatar: string;
+}
+
+interface Post {
+  user_id: number;
+  title: string;
+  content: string;
+  timestamp: Date;
+  username: string;
+  
 }
 
 
