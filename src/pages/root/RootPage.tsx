@@ -5,18 +5,21 @@ import {
     Button,
     CssBaseline,
     IconButton,
+    ListItemIcon,
+    ListItemText,
     Menu,
     MenuItem,
     Toolbar,
     Typography,
     useTheme
 } from "@mui/material";
-import {AccountCircle, DarkMode, LightMode} from "@mui/icons-material";
+import {AccountCircle, Add, DarkMode, LightMode, Logout, People} from "@mui/icons-material";
 import {useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
 import {useThemeSwitch} from "../../hooks/useThemeSwitch.tsx";
 import {StyledField} from "./components/StyledField.tsx";
 import Sidebar from "./components/Sidebar.tsx";
+import GroupCreationDialog from "./dialog/GroupCreationDialog.tsx";
 
 export default function RootPage() {
 
@@ -29,8 +32,11 @@ export default function RootPage() {
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+    const [openGroupCreateDialog, setOpenGroupCreateDialog] = useState(false)
+
     return (
         <Box sx={{display: 'flex'}}>
+            <GroupCreationDialog open={openGroupCreateDialog} setOpen={setOpenGroupCreateDialog}/>
             <CssBaseline/>
             <AppBar position="fixed" sx={{zIndex: (theme) => theme.zIndex.drawer + 1}}>
                 <Toolbar>
@@ -62,12 +68,31 @@ export default function RootPage() {
                                     <MenuItem onClick={() => {
                                         setAnchorEl(null)
                                         navigate(`profile/1`);
-                                    }}>Profile</MenuItem>
+                                    }}>
+                                        <ListItemIcon>
+                                            <People fontSize="small"/>
+                                        </ListItemIcon>
+                                        <ListItemText>Profile</ListItemText>
+                                    </MenuItem>
+                                    <MenuItem onClick={() => {
+                                        setAnchorEl(null)
+                                        setOpenGroupCreateDialog(true)
+                                    }}>
+                                        <ListItemIcon>
+                                            <Add fontSize="small"/>
+                                        </ListItemIcon>
+                                        <ListItemText> Create group</ListItemText>
+                                    </MenuItem>
                                     <MenuItem onClick={() => {
                                         setAnchorEl(null)
                                         setToken("")
                                         console.log("Have a nice day :)")
-                                    }}>Logout</MenuItem>
+                                    }}>
+                                        <ListItemIcon>
+                                            <Logout fontSize="small"/>
+                                        </ListItemIcon>
+                                        <ListItemText>Logout</ListItemText>
+                                    </MenuItem>
                                 </Menu>
                             </>
                             : <Button color="inherit" component={Link} to="login">Login</Button>}
