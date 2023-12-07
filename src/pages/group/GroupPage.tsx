@@ -18,15 +18,12 @@ import React, {useEffect, useState} from "react";
 import CancelIcon from '@mui/icons-material/Cancel';
 import {blue} from "@mui/material/colors";
 import {Navigate, useParams} from "react-router-dom";
-import GroupCreationDialog from "./dialog/GroupCreationDialog.tsx";
-import PostCreationDialog from "./dialog/PostCreationDialog.tsx";
 import {User} from "../../services/types";
+import PostCreationDialog from "./dialog/PostCreationDialog.tsx";
 
 export default function GroupPage() {
 
-    const [openCreateGroupDialog, setOpenCreateGroupDialog] = useState(false);
-
-    const {isAuthorized} = useAuth()
+    const {getToken} = useAuth()
 
     const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
     const [groupNotFound, setGroupNotFound] = useState(false);
@@ -169,7 +166,7 @@ export default function GroupPage() {
     const handleCreatePost = async (title: string, content: string) => {
         try {
             console.log(title, content);
-            let userID = 1; // FOR NOW - fix once jwt available
+            const userID = 1; // FOR NOW - fix once jwt available
             console.log(userID, ' ', groupId);
 
             const response = await fetch('http://localhost:3001/group-post/', {
@@ -199,7 +196,6 @@ export default function GroupPage() {
 
     return (
         <>
-            <GroupCreationDialog open={openCreateGroupDialog} setOpen={setOpenCreateGroupDialog}/>
             <PostCreationDialog
                 open={openCreatePostDialog}
                 setOpen={setOpenCreatePostDialog}
