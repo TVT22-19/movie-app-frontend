@@ -17,7 +17,17 @@ import {
     Typography,
     useTheme
 } from "@mui/material";
-import {AccountCircle, Cancel, Check, DarkMode, LightMode, Notifications, Add, Logout, People} from "@mui/icons-material";
+import {
+    AccountCircle,
+    Add,
+    Cancel,
+    Check,
+    DarkMode,
+    LightMode,
+    Logout,
+    Notifications,
+    People
+} from "@mui/icons-material";
 import {useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
 import {useThemeSwitch} from "../../hooks/useThemeSwitch.tsx";
