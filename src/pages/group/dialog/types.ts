@@ -1,6 +1,6 @@
 import {Dispatch} from "react";
 
-export interface CreateGroupDialogProps {
+export interface CreatePostDialogProps {
     open: boolean,
     setOpen: Dispatch<boolean>
 }

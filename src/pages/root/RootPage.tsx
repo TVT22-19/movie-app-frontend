@@ -133,7 +133,7 @@ export default function RootPage() {
                                         <ListItemText>Profile</ListItemText>
                                     </MenuItem>
                                     <MenuItem onClick={() => {
-                                        setAnchorEl(null)
+                                        setNotifyAnchorEl(null)
                                         setOpenGroupCreateDialog(true)
                                     }}>
                                         <ListItemIcon>
