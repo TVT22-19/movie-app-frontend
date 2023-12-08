@@ -4,6 +4,8 @@ import {useState} from "react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {User} from "../services/types";
 import {useAuth} from "../hooks/useAuth.tsx";
+import {useLogin} from "../services/auth.ts";
+import {Loader} from "../components/Loader.tsx";
 
 export default function LoginPage() {
     const {state} = useLocation()
@@ -17,11 +19,25 @@ export default function LoginPage() {
     const {isAuthorized, setToken} = useAuth()
     if (isAuthorized) navigate("/profile")
 
-    function loginUser(username: string, password: string) {
-        setUser(undefined)
+    const {data, status, error} = useLogin(user)
 
+    if (status === "pending" && user) return (<Loader/>)
+
+    if (status === "error" && user) {
+        console.log(error?.message, {variant: "error"})
+        setUser(undefined)
+    }
+
+    if (status === "success" && user) {
+        setToken(data.token)
+        setUser(undefined)
+        console.log(`Welcome back ${user.username}`, {variant: "info"})
+        navigate("/profile")
+    }
+
+    function loginUser(username: string, password: string) {
         if (username.trim() === "" || password.trim() === "") {
-            console.log("Some fields is empty")
+            console.log("Some fields is empty", {variant: "warning"})
             return
         }
 
@@ -29,9 +45,6 @@ export default function LoginPage() {
             username: username,
             password: password
         })
-
-        //TODO Add real authorization using API
-        setToken("TOKEN")
     }
 
     return (
