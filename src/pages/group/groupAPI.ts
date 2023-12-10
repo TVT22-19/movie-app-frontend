@@ -1,25 +1,24 @@
 
 import { GroupData, Member, Post } from "./types.ts";
 
-//add hostUrl as variable here 
 const hostUrl: string = "http://localhost:3001"
 
-//Promises?
-export const fetchMembers = async (groupId: number) => {
+
+export const fetchMembers = async (groupId: number): Promise <Member[]> => {
 
     const response = await fetch(`${hostUrl}/group/members/${groupId}`);
     if (response.status !== 200) throw new Error((await response.json()).message);
 
-    return await response.json();
+    return await response.json() as Member[];
 }
 
 
-export const fetchDiscussionPosts = async (groupId: number) => {
+export const fetchDiscussionPosts = async (groupId: number): Promise <Post[]> => {
 
     const response = await fetch(`${hostUrl}/group-post/${groupId}`);
     if (response.status !== 200) throw new Error((await response.json()).message);
 
-    return await response.json();
+    return await response.json() as Post[];
 }
 
 export const createDiscussionPost = async (title: string, content: string, groupID: number, userID: number) => {
@@ -38,23 +37,20 @@ export const createDiscussionPost = async (title: string, content: string, group
 }
 
 
-export const fetchGroupInfo = async (groupId: number) => {
+export const fetchGroupInfo = async (groupId: number): Promise <GroupData> => {
 
     const response = await fetch(`${hostUrl}/group/${groupId}`);
     if (response.status !== 200) throw new Error((await response.json()).message);
-    return await response.json();
+    return await response.json() as GroupData;
 }
 
 
-
 export const removeMember = async (selectedUserId: number, groupId: number)=> {
-    if (selectedUserId){
-
     const response = await fetch(`${hostUrl}/group/deletemember/${selectedUserId}/from/${groupId}`, {
         method: 'DELETE',
     });
     if (response.status !== 200) throw new Error((await response.json()).message); 
-    return await response.json();}
+    return await response.json();
 }
 
 export const checkMembership = async (userId: number, groupId: number) => {

@@ -1,30 +1,24 @@
 import React from "react";
 import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
-import { useRemoveMember } from "../groupqueries";
+//import { useRemoveMember } from "../groupqueries";
+import { RemoveMemberDialogProps } from "./types";
 
 
-interface RemoveMemberDialogProps {
-    open: boolean;
-    selectedUserId: number;
-    groupId: number;
-    onClose: () => void;
-  }
-  
-  const RemoveMemberDialog: React.FC<RemoveMemberDialogProps> = ({ open, selectedUserId, groupId, onClose }) => {
-    const removeMemberQuery = useRemoveMember(selectedUserId, groupId);
-  
+
+const RemoveMemberDialog = (props: RemoveMemberDialogProps) => {
+   
     const handleRemoveConfirm = () => {
       
-      removeMemberQuery.refetch();
+      //
     };
   
     const handleRemoveCancel = () => {
-      onClose();
+      props.onClose();
     };
   
     return (
-      <Dialog open={open} onClose={handleRemoveCancel}>
-        <DialogTitle>{`Remove user with id: ${selectedUserId} from the group?`}</DialogTitle>
+      <Dialog open={props.open} onClose={handleRemoveCancel}>
+        <DialogTitle>{`Remove user with id: ${props.selectedUserId} from the group?`}</DialogTitle>
         <DialogActions>
           <Button onClick={handleRemoveCancel} color="primary">
             Cancel

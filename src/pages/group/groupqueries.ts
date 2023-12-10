@@ -26,11 +26,8 @@ export const useCreatePost = (title: string, content: string, groupID: number, u
     
 })
 
-export const useRemoveMember = (selectedUserId: number, groupId: number) => useQuery< void , Error>({
-    queryKey: ["removemember", selectedUserId, groupId],
-    queryFn: () => removeMember(selectedUserId, groupId),
-    
-})
+//export const useRemoveMember = (selectedUserId: number, groupId: number) => 
+//useMutation
 
 export const useCheckMembership = (userId: number, groupId: number) => useQuery< void, Error>({
     queryKey: ["checkmembership", userId, groupId],
