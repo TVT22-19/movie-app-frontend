@@ -7,6 +7,7 @@ import MoviePage from "./pages/MoviePage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
 import BrowseGroupsPage from "./pages/BrowseGroupsPage.tsx";
+import SearchPage from "./pages/SearchPage.tsx";
 
 import {AuthProvider} from "./hooks/useAuth.tsx";
 import {ThemeSwitchProvider} from "./hooks/useThemeSwitch.tsx";
@@ -31,7 +32,7 @@ export default function App() {
 
                                     <Route path="group/:id" element={<GroupPage/>}/>
                                     <Route path="browsegroups" element={<BrowseGroupsPage/>}/>
-
+                                    <Route path="search" element={<SearchPage/>}/>
 
                                     <Route path="movie/:id" element={<MoviePage/>}/>
 
