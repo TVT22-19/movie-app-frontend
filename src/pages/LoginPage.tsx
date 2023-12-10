@@ -29,7 +29,7 @@ export default function LoginPage() {
     }
 
     if (status === "success" && user) {
-        setToken(data.token)
+        if (data.token != null) setToken(data.token)
         setUser(undefined)
         console.log(`Welcome back ${user.username}`, {variant: "info"})
         navigate("/profile")

@@ -1,7 +1,7 @@
 import {ApiError, AuthObject, User} from "./types.ts";
 
 // TODO Add url address for remove server
-const hostUrl: string = "..."
+const hostUrl: string = "http://localhost:3001"
 
 // Example request
 export const getUser = async (id: number): Promise<User> => {
@@ -21,6 +21,18 @@ export const login = async (user: User): Promise<AuthObject> => {
     })
 
     if (response.status !== 200) throw new Error((await response.json() as ApiError).error)
+
+    return await response.json() as AuthObject
+}
+
+export const register = async (user: User): Promise<AuthObject> => {
+    const response = await fetch(`${hostUrl}/auth/registration`, {
+        method: "POST", headers: {
+            "Content-Type": "application/json"
+        }, body: JSON.stringify(user)
+    })
+
+    if (response.status !== 201) throw new Error((await response.json() as ApiError).error)
 
     return await response.json() as AuthObject
 }

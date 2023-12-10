@@ -12,7 +12,7 @@ export interface Group {
 export interface AuthObject {
     message: string,
     user: User,
-    token: string
+    token?: string
 }
 
 export interface ApiError {
