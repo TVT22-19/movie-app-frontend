@@ -1,7 +1,7 @@
 import {ApiError, AuthObject, User} from "./types.ts";
 
 // TODO Add url address for remove server
-const hostUrl: string = "..."
+const hostUrl: string = "http://localhost:3001"
 
 // Example request
 export const getUser = async (id: number): Promise<User> => {
