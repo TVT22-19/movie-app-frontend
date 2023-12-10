@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-    AppBar,
     Box,
     Button,
     Card,
@@ -13,46 +12,71 @@ import {
     useTheme,
     Rating
 } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
 
+//will be moved
 interface Movie {
+
+    adult: boolean;
+    backdrop_path: string;
+    genre_ids: number[];
     id: number;
+    original_language: string;
+    original_title: string;
+    overview: string;
+    popularity: number;
+    poster_path: string;
+    release_date: string;
     title: string;
-    rating: number;
-    year: number;
-    imageUrl: string;
+    video: boolean;
+    vote_average: number;
+    vote_count: number;
+
 }
 
-const dummyMovies: Movie[] = [
-    {
-        id: 1,
-        title: 'Movie 1',
-        rating: 4.5,
-        year: 2022,
-        imageUrl: 'https://static.wikia.nocookie.net/fanongarfield/images/9/9f/GarfieldCharacter.jpg',
-    },
-    {
-        id: 2,
-        title: 'Movie 2',
-        rating: 3.8,
-        year: 2020,
-        imageUrl: 'https://static.wikia.nocookie.net/fanongarfield/images/9/9f/GarfieldCharacter.jpg', 
-    },
+const hostUrl: string = "http://localhost:3001"
 
-];
+const fetchMovies = async (query: string) => {
+    if (!query) {
+        return [];
+    }
+    const response = await fetch(`${hostUrl}/moviedb/search/${query}`);
+    if (response.status !== 200) throw new Error((await response.json()).message);
+    const data = await response.json();
+    return data.results;
+}
+
+
 
 const SearchPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [minYear, setMinYear] = useState<number>(0);
-    const [movies, setMovies] = useState<Movie[]>(dummyMovies);
+    const [year, setYear] = useState<number>(0);
     const [value, setValue] = React.useState<number | null>(2);
+    const [timeToSearch, setTimeToSearch] = useState<boolean>(false);
+
+    const useFetchMovies = (query: string) => useQuery<Movie[] | undefined, Error>({
+        queryKey: ["fetchmovies", query],
+        queryFn: () => fetchMovies(query),
+        enabled: timeToSearch,
+    });
+
+    const { data: movies, isLoading, isError } = useFetchMovies(searchQuery);
+
+
+    //add actual logic for when the search is performed
 
     const handleSearch = () => {
-   
-        const searchResults = dummyMovies;
-        //
 
-        setMovies(searchResults);
+        setTimeToSearch(true);
+        
+
     };
+
+    React.useEffect(() => {
+        if (movies) {
+            setTimeToSearch(false);
+        }
+    }, [timeToSearch]);
 
     const theme = useTheme();
 
@@ -77,11 +101,11 @@ const SearchPage: React.FC = () => {
                     <Grid item xs={6} sm={3} md={2}>
                         <TextField
                             type="number"
-                            label="Min Year"
+                            label="Year"
                             variant="outlined"
                             fullWidth
-                            value={minYear}
-                            onChange={(e) => setMinYear(Number(e.target.value))}
+                            value={year}
+                            onChange={(e) => setYear(Number(e.target.value))}
                         />
                     </Grid>
                     <Grid item xs={6} sm={3} md={2}>
@@ -112,32 +136,36 @@ const SearchPage: React.FC = () => {
                     Search Results
                 </Typography>
                 <Grid container spacing={3}>
-                    {movies.map((movie) => (
+                    
+                    {isLoading && <div>Loading...</div>}
+                    {isError && <div>Error loading movies</div>}
+                    {movies?.map((movie) => (
                         <Grid item key={movie.id} xs={12}>
-                            <Card sx={{display: 'flex'}}>
-                                <CardMedia
-                                    component="img"
-                                    alt={movie.title}
-                                    width="140"
-                                   
-                                    image={movie.imageUrl}
-                                    sx={{ flex: '10%' }}
-                                />
-                                <CardContent sx={{ flex: '90%' }}>
-                                    <Typography variant="h6">{movie.title}</Typography>
-                                    <Typography variant="body2">
-                                        Rating: {movie.rating} / 5 | Year: {movie.year}
-                                        <br /> 
-                                        <br /> 
-                                
-                                        Lorem ipsum
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
+                        <Card sx={{display: 'flex'}}>
+                            <CardMedia
+                                component="img"
+                                alt={movie.title}
+                                width="140"
+                               
+                                image={movie.poster_path}
+                                sx={{ flex: '10%' }}
+                            />
+                            <CardContent sx={{ flex: '90%' }}>
+                                <Typography variant="h6">{movie.title}</Typography>
+                                <Typography variant="body2">
+                                    Rating: {movie.vote_average} / 10 | Year: {new Date(movie.release_date).getFullYear()}
+                                    <br /> 
+                                    <br /> 
+                            
+                                    {movie.overview}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
                     ))}
                 </Grid>
             </Box>
+
         </div>
     );
 };
