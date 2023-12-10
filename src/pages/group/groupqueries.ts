@@ -21,13 +21,18 @@ export const useFetchGroupInfo = (groupId: number) => useQuery< GroupData, Error
 })
 
 export const useCreatePost = (title: string, content: string, groupID: number, userID: number) => useQuery<void , Error>({ /*void?? undefined? what to put here?*/
-    queryKey: ["createpost", title, content, groupID, userID],
-    queryFn: () => createDiscussionPost(title, content, groupID, userID),
-    
-})
+ queryKey: ["createpost", title, content, groupID, userID],
+ queryFn: () => createDiscussionPost(title, content, groupID, userID),  }) 
 
-//export const useRemoveMember = (selectedUserId: number, groupId: number) => 
 //useMutation
+/*
+export const useRemoveMember = (selectedUserId: number, groupId: number) => useQuery< void , Error>({
+queryKey: ["removemember", selectedUserId, groupId],
+queryFn: () => removeMember(selectedUserId, groupId),
+
+})
+*/
+
 
 export const useCheckMembership = (userId: number, groupId: number) => useQuery< void, Error>({
     queryKey: ["checkmembership", userId, groupId],
