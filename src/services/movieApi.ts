@@ -24,3 +24,15 @@ export const login = async (user: User): Promise<AuthObject> => {
 
     return await response.json() as AuthObject
 }
+
+export const register = async (user: User): Promise<AuthObject> => {
+    const response = await fetch(`${hostUrl}/auth/registration`, {
+        method: "POST", headers: {
+            "Content-Type": "application/json"
+        }, body: JSON.stringify(user)
+    })
+
+    if (response.status !== 201) throw new Error((await response.json() as ApiError).error)
+
+    return await response.json() as AuthObject
+}
