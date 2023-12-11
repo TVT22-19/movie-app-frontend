@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -10,7 +10,10 @@ import {
     CardMedia,
     Typography,
     useTheme,
-    Rating
+    Rating,
+    FormControlLabel,
+    Radio,
+    RadioGroup
 } from '@mui/material';
 
 
@@ -33,46 +36,60 @@ interface Movie {
     vote_count: number;
 
 }
+interface TVSeries extends Movie {
+    origin_country: string[];
+    first_air_date: string;
+    name: string;
+}
 
 const hostUrl: string = "http://localhost:3001"
 
-const fetchMovies = async (query: string) => {
+const fetchMedia = async (query: string, isMovie: boolean) => {
     if (!query) {
         return [];
     }
-    const response = await fetch(`${hostUrl}/moviedb/search/movie/${query}`);
+    
+    const mediaType = isMovie ? 'movie' : 'tv';
+    const response = await fetch(`${hostUrl}/moviedb/search/${mediaType}/${query}`);
+    
     if (response.status !== 200) throw new Error((await response.json()).message);
+    
     const data = await response.json();
-    return data.results;
+    return isMovie ? data.results : (data.results as TVSeries[]);
 }
-
 
 const SearchPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [year, setYear] = useState<number>(0);
     const [value, setValue] = React.useState<number | null>(2);
-    const [movies, setMovies] = useState<Movie[] | undefined>(undefined);
+    const [isMovie, setIsMovie] = useState<boolean>(true); // default to searching for movies
+    const [mediaResults, setMediaResults] = useState<(Movie | TVSeries)[] | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
+
+    useEffect(() => {
+        setMediaResults(undefined);
+    }, [isMovie]);
+
 
 
     const handleSearch = async () => {
         try {
             setIsLoading(true);
-            const data = await fetchMovies(searchQuery);
-    
-            // filter movies by year
-            const filteredMoviesByYear = year !== 0
-                ? data.filter((movie: Movie) => new Date(movie.release_date).getFullYear() === year)
+            const data = await fetchMedia(searchQuery, isMovie);
+
+            const filteredMediaByYear = year !== 0
+                ? data.filter((media: Movie | TVSeries)=> {
+                    const releaseDate = isMovie ? (media as Movie).release_date : (media as TVSeries).first_air_date;
+                    return new Date(releaseDate).getFullYear() === year;
+                })
                 : data;
     
-            // filter movies by minimum rating
-            const filteredMovies = value !== null
-                ? filteredMoviesByYear.filter((movie: Movie) => movie.vote_average >= value * 2) // scaling to convert 5 stars to 0-10 scale
-                : filteredMoviesByYear;
+            const filteredMedia = value !== null
+                ? filteredMediaByYear.filter((media: Movie | TVSeries) => media.vote_average >= value * 2) // scaling to convert 5 stars to 0-10 scale
+                : filteredMediaByYear;
     
-            setMovies(filteredMovies);
-
+            setMediaResults(filteredMedia);
         } catch (error) {
             setIsError(true);
         } finally {
@@ -94,6 +111,17 @@ const SearchPage: React.FC = () => {
                 <Typography variant="h5" gutterBottom>
                     Search Filters
                 </Typography>
+                <RadioGroup
+                    row
+                    aria-label="media-type"
+                    name="media-type"
+                    value={isMovie ? 'movie' : 'tv'}
+                    onChange={(e) => setIsMovie(e.target.value === 'movie')}
+                >
+                    <FormControlLabel value="movie" control={<Radio />} label="Movies" />
+                    <FormControlLabel value="tv" control={<Radio />} label="TV Series" />
+                </RadioGroup>
+                
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
                         <TextField
@@ -169,30 +197,30 @@ const SearchPage: React.FC = () => {
 
                     {isLoading && <div>Loading...</div>}
                     {isError && <div>Error loading movies</div>}
-                    {movies?.map((movie) => (
-                        <Grid item key={movie.id} xs={12}>
+                    {mediaResults?.map((media) => (
+                        <Grid item key={media.id} xs={12}>
                             <Card sx={{ display: 'flex' }}>
                                 <CardMedia
                                     component="img"
-                                    alt={movie.title}
+                                    alt={isMovie ? (media as Movie).title : (media as TVSeries).name}
                                     width="140"
-
-                                    image={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
-                                    sx={{    
+                                    image={`https://image.tmdb.org/t/p/original/${media.poster_path}`}
+                                    sx={{
                                         flex: '10%',
-                                        maxWidth: '15%', //image scaling weirdness forced my hand, but maybe this works
+                                        maxWidth: '15%',
                                         height: 'auto',
-                                        
                                     }}
                                 />
                                 <CardContent sx={{ flex: '90%' }}>
-                                    <Typography variant="h6">{movie.title}</Typography>
+                                    <Typography variant="h6">
+                                        {isMovie ? (media as Movie).title : (media as TVSeries).name}
+                                    </Typography>
                                     <Typography variant="body2">
-                                        Rating: {movie.vote_average} / 10 | Year: {new Date(movie.release_date).getFullYear()}
+                                        Rating: {media.vote_average} / 10 | 
+                                        Year: {new Date(isMovie ? (media as Movie).release_date : (media as TVSeries).first_air_date).getFullYear()}
                                         <br />
                                         <br />
-
-                                        {movie.overview}
+                                        {media.overview}
                                     </Typography>
                                 </CardContent>
                             </Card>
