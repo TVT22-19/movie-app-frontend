@@ -21,7 +21,6 @@ import { fetchMedia } from './movieAndSearchQueries';
 import { useNavigate } from 'react-router-dom';
 
 //TODO: hide "clear rating" if rating is set to 0, make the clear rating and clear year buttons prettier
-//TODO: don't show option to navigate from result cards if results are tv series (as tv series pages don't exist atm) / other solution
 
 const hostUrl: string = "http://localhost:3001"
 
@@ -72,7 +71,8 @@ const SearchPage: React.FC = () => {
     };
 
     const handleMovieClick = (movieId: number) => {
-        navigate(`/movie/${movieId}`);
+        if (isMovie==true){
+        navigate(`/movie/${movieId}`);}
       };
 
     const theme = useTheme();
@@ -170,7 +170,7 @@ const SearchPage: React.FC = () => {
                     {isError && <div>Error loading movies</div>}
                     {mediaResults?.map((media) => (
                         <Grid item key={media.id} xs={12}>
-                            <div onClick={() => handleMovieClick(media.id)} style={{ cursor: 'pointer' }}>
+                            <div onClick={() => handleMovieClick(media.id)} style={{ cursor: isMovie ? 'pointer' : 'default' }}>
                                 <Card sx={{ display: 'flex' }}>
                                     <CardMedia
                                         component="img"
