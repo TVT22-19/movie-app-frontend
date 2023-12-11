@@ -5,7 +5,8 @@ import {useState} from "react";
 import ProfileEditDialog from "./dialog/ProfileEditDialog.tsx";
 
 import {useUser} from "../../services/users.ts"
-import {User} from "../../services/types.ts"
+import {User, Reviews} from "../../services/types.ts"
+import {useReviews} from "../../services/reviews.ts"
 
 export default function ProfilePage() {
 
@@ -14,18 +15,28 @@ export default function ProfilePage() {
     const profileId = Number(useParams().id)
     if (Number.isNaN(profileId)) return <Navigate to="/page-not-found"/>
 
-    const {data, status, error} = useUser(profileId)
-    const [user, setUser] = useState<User>()
-    //const [date, setDate] = useState<Date>()
+    const {data: userData, status: userStatus, error: userError} = useUser(profileId)
+    const {data: reviewData, status: reviewStatus, error: reviewError} = useReviews(profileId)
 
-    if(status === "pending") return (<h1>Loading...</h1>)
+    if(userStatus === "pending") return (<h1>Loading...</h1>)
 
-    if(status === "error"){
-        console.log(error.message, {variant: "error"})
+    if(userStatus === "error"){
+        console.log(userError.message, {variant: "error"})
     }
 
-    if(status === "success"){
+    if(userStatus === "success"){
         console.log(`Found user with ID: ${profileId}`)
+    }
+
+    if(reviewStatus === "pending") return (<h1>Loading...</h1>)
+
+    if(reviewStatus === "error"){
+        console.log(reviewError.message, {variant: "error"})
+    }
+
+    if(reviewStatus === "success"){
+        console.log(`Found review with ID: ${profileId}`)
+        console.log(reviewData)
     }
 
     return (
@@ -41,9 +52,9 @@ export default function ProfilePage() {
                                 height: 100
                             }}>RN</Avatar>
                             <Stack alignSelf="center" flexGrow={1}>
-                                <Typography>{data?.username} ({data?.firstname} {data?.lastname})</Typography>
-                                <Typography>Age: {data?.age}</Typography>
-                                <Typography>Registered: {new Date(data?.registration_date!!).toLocaleDateString()}</Typography>
+                                <Typography>{userData?.username} ({userData?.firstname} {userData?.lastname})</Typography>
+                                <Typography>Age: {userData?.age}</Typography>
+                                <Typography>Registered: {new Date(userData?.registration_date!!).toLocaleDateString()}</Typography>
                             </Stack>
                             <Stack>
                                 <IconButton onClick={() => setOpenEditDialog(true)}>
@@ -60,13 +71,15 @@ export default function ProfilePage() {
                 <Divider/>
 
                 <Typography variant="h4" textAlign="center">Reviews</Typography>
-                {[1, 2, 3].map(() =>
+                {reviewData!.map((data) =>
                     <Card>
                         <CardContent>
-                            Aut fugiat exercitationem vel non dolorum placeat sit nihil. Quaerat et et eos placeat
-                            placeat. Eaque voluptates nemo iste perspiciatis ullam est et debitis. Dolore cumque et sit
-                            labore necessitatibus corporis dolores praesentium. Cumque maxime quo iste quis dignissimos
-                            et sit doloremque.
+                            <Stack spacing={2} direction="row" alignSelf="start">
+                                {data.content}
+                            </Stack>
+                            <Stack alignSelf="end">
+                                {data.rating}
+                            </Stack>
                         </CardContent>
                     </Card>
                 )}

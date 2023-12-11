@@ -22,3 +22,12 @@ export interface AuthObject {
 export interface ApiError {
     error: string
 }
+
+export interface Reviews {
+    id: number,
+    date: string,
+    user_id: number,
+    movie_id: number,
+    content: string,
+    rating: string
+}
