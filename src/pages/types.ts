@@ -21,3 +21,12 @@ export interface TVSeries extends Movie {
     first_air_date: string;
     name: string;
 }
+
+export interface Review {
+    id: number;
+    timestamp: string | null; 
+    user_id: number;
+    movie_id: number;
+    content: string;
+    rating: number | null; 
+}
