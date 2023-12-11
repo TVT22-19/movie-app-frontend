@@ -18,7 +18,7 @@ import {
 
 import { Movie, TVSeries } from './types';
 import { fetchMedia } from './movieAndSearchQueries';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 //TODO: hide "clear rating" if rating is set to 0, make the clear rating and clear year buttons prettier
 
@@ -26,7 +26,8 @@ const hostUrl: string = "http://localhost:3001"
 
 
 const SearchPage: React.FC = () => {
-    const [searchQuery, setSearchQuery] = useState<string>('');
+    const { query } = useParams(); 
+    const [searchQuery, setSearchQuery] = useState<string>(query || ''); 
     const [year, setYear] = useState<number>(0);
     const [value, setValue] = React.useState<number | null>(0);
     const [isMovie, setIsMovie] = useState<boolean>(true); // default to searching for movies
@@ -40,6 +41,12 @@ const SearchPage: React.FC = () => {
         setMediaResults(undefined);
     }, [isMovie]);
 
+    useEffect(() => {
+        if (query && query.trim() !== '') {
+            setSearchQuery(query);
+            handleSearch();
+        }
+    }, [query]);
 
 
     const handleSearch = async () => {

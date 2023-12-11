@@ -33,6 +33,7 @@ export default function App() {
                                     <Route path="group/:id" element={<GroupPage/>}/>
                                     <Route path="browsegroups" element={<BrowseGroupsPage/>}/>
                                     <Route path="search" element={<SearchPage/>}/>
+                                    <Route path="/search/:query" element={<SearchPage />} />
 
                                     <Route path="movie/:id" element={<MoviePage/>}/>
 
