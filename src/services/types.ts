@@ -2,6 +2,10 @@ export interface User {
     id?: number,
     username: string,
     password?: string
+    firstname?: string,
+    lastname?: string,
+    age?: number,
+    registration_date?: string
 }
 
 export interface Group {

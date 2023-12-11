@@ -1,8 +1,11 @@
 import {Avatar, Card, CardContent, Divider, IconButton, Stack, Typography} from "@mui/material";
-import {Navigate, useParams} from "react-router-dom";
-import {Delete, Edit,} from "@mui/icons-material";
+import {Navigate, useParams, useLocation} from "react-router-dom";
+import {ContentPasteSearchOutlined, DateRange, Delete, Edit,} from "@mui/icons-material";
 import {useState} from "react";
 import ProfileEditDialog from "./dialog/ProfileEditDialog.tsx";
+
+import {useUser} from "../../services/users.ts"
+import {User} from "../../services/types.ts"
 
 export default function ProfilePage() {
 
@@ -11,6 +14,19 @@ export default function ProfilePage() {
     const profileId = Number(useParams().id)
     if (Number.isNaN(profileId)) return <Navigate to="/page-not-found"/>
 
+    const {data, status, error} = useUser(profileId)
+    const [user, setUser] = useState<User>()
+    //const [date, setDate] = useState<Date>()
+
+    if(status === "pending") return (<h1>Loading...</h1>)
+
+    if(status === "error"){
+        console.log(error.message, {variant: "error"})
+    }
+
+    if(status === "success"){
+        console.log(`Found user with ID: ${profileId}`)
+    }
 
     return (
         <>
@@ -25,9 +41,9 @@ export default function ProfilePage() {
                                 height: 100
                             }}>RN</Avatar>
                             <Stack alignSelf="center" flexGrow={1}>
-                                <Typography>Username (Real Name)</Typography>
-                                <Typography>Age: 19</Typography>
-                                <Typography>Registered: {new Date().toLocaleDateString()}</Typography>
+                                <Typography>{data?.username} ({data?.firstname} {data?.lastname})</Typography>
+                                <Typography>Age: {data?.age}</Typography>
+                                <Typography>Registered: {new Date(data?.registration_date!!).toLocaleDateString()}</Typography>
                             </Stack>
                             <Stack>
                                 <IconButton onClick={() => setOpenEditDialog(true)}>
