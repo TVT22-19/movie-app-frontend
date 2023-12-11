@@ -16,52 +16,18 @@ import {
     RadioGroup
 } from '@mui/material';
 
+import { Movie, TVSeries } from './types';
+import { fetchMedia } from './movieAndSearchQueries';
 
-//will be moved
-interface Movie {
-
-    adult: boolean;
-    backdrop_path: string;
-    genre_ids: number[];
-    id: number;
-    original_language: string;
-    original_title: string;
-    overview: string;
-    popularity: number;
-    poster_path: string;
-    release_date: string;
-    title: string;
-    video: boolean;
-    vote_average: number;
-    vote_count: number;
-
-}
-interface TVSeries extends Movie {
-    origin_country: string[];
-    first_air_date: string;
-    name: string;
-}
+//TODO: hide "clear rating" if it's set to 0, make the clear rating and clear year buttons prettier
 
 const hostUrl: string = "http://localhost:3001"
 
-const fetchMedia = async (query: string, isMovie: boolean) => {
-    if (!query) {
-        return [];
-    }
-    
-    const mediaType = isMovie ? 'movie' : 'tv';
-    const response = await fetch(`${hostUrl}/moviedb/search/${mediaType}/${query}`);
-    
-    if (response.status !== 200) throw new Error((await response.json()).message);
-    
-    const data = await response.json();
-    return isMovie ? data.results : (data.results as TVSeries[]);
-}
 
 const SearchPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [year, setYear] = useState<number>(0);
-    const [value, setValue] = React.useState<number | null>(2);
+    const [value, setValue] = React.useState<number | null>(0);
     const [isMovie, setIsMovie] = useState<boolean>(true); // default to searching for movies
     const [mediaResults, setMediaResults] = useState<(Movie | TVSeries)[] | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -145,7 +111,6 @@ const SearchPage: React.FC = () => {
                         />
 
 
-                        {/*ugly, ignore that for now*/}
                         {year !== 0 && (
 
                             <Button
