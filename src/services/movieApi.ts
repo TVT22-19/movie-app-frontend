@@ -44,3 +44,29 @@ export const getReviews = async (user_id: number): Promise<Reviews[]> => {
 
     return await response.json() as Reviews[]
 }
+
+export const updateUser = async (user: User): Promise<User> => {
+    const response = await fetch(`${hostUrl}/users/update`, {
+        method: "POST", headers: {
+            "Content-Type": "application/json"
+        }, body: JSON.stringify({
+            username: user.username,
+            password: user.password,
+            age: user.age,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            avatar_url: user.avatarURL,
+            id: user.id
+        })
+    })
+
+    if (response.status !== 200) throw new Error((await response.json()).message)
+
+    const jsonResponse = response.json()
+
+    console.log("updateUser jsonResponse:")
+    console.log(jsonResponse)
+
+    return await jsonResponse
+    //response.json()
+}
