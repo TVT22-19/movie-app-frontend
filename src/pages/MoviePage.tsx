@@ -26,8 +26,8 @@ import { useFetchMovieData, useFetchReviewsByMovieId, addReview } from "./movieA
 import MovieRating from "./MovieRating.tsx";
 import { useState } from "react";
 import { Review } from "./types.ts";
+import { User } from "../services/types.ts";
 
-//TODO: use actual user id for adding reviews 
 //TODO: re-fetch reviews to display the one just added
 //TODO: sort the reviews chronologically upon fetch (currently sorting doesn't happen automatically - only when radio buttons change)
 
@@ -37,7 +37,8 @@ export default function MoviePage() {
     const [sortOption, setSortOption] = useState<'chronological' | 'rating'>('chronological');
     const [sortedReviews, setSortedReviews] = useState<Review[] | null>([]);
 
-    const { isAuthorized } = useAuth()
+    const { isAuthorized, getToken } = useAuth()
+    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
     const movieId = Number(useParams().id)
     if (Number.isNaN(movieId)) return <Navigate to="/page-not-found" />
@@ -59,10 +60,14 @@ export default function MoviePage() {
             const ratingToSend = reviewRating ?? 0;
             console.log('Content:', reviewContent);
             console.log('Rating:', reviewRating);
-            addReview(2, movieId, reviewContent, ratingToSend);
+            if (user?.userId !== undefined) {
+            addReview(user.userId, movieId, reviewContent, ratingToSend);
             setReviewContent('');
             setReviewRating(0);
             //refetch
+            }else{
+                console.log("User ID undefined")
+            }
 
         } catch (error) {
             console.error("Error adding review", error);
