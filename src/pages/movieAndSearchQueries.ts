@@ -50,7 +50,7 @@ const fetchReviewsByMovieId = async (id: number): Promise <Review[]> => {
 
     const reviewsWithUsernames = reviews.map((review: Review, index: number) => ({
         ...review,
-        username: users[index].username, // Assuming the response has a 'username' property
+        username: users[index].username, 
     }));
 
     return reviewsWithUsernames;
@@ -70,8 +70,7 @@ export const addReview = async (userID: number, movieID:number, content: string,
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userID, movieID, content}), //until backend is edited
-      //body: JSON.stringify({ userID, movieID, content, rating}),
+      body: JSON.stringify({ userID, movieID, content, rating}),
     });
   
     if (!response.ok) {

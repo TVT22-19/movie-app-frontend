@@ -24,7 +24,7 @@ export interface TVSeries extends Movie {
 
 export interface Review {
     id: number;
-    timestamp: string | null; 
+    timestamp: string; 
     user_id: number;
     movie_id: number;
     content: string;
