@@ -29,4 +29,5 @@ export interface Review {
     movie_id: number;
     content: string;
     rating: number | null; 
+    username: string | null; 
 }

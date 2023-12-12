@@ -11,7 +11,8 @@ import {
     Stack,
     Typography,
     Box,
-    IconButton
+    IconButton,
+    CardMedia
 } from "@mui/material";
 import { useAuth } from "../hooks/useAuth.tsx";
 import SendIcon from '@mui/icons-material/Send';
@@ -20,10 +21,8 @@ import MovieRating from "./MovieRating.tsx";
 import { useState } from "react";
 
 //TODO: display rating on reviews
-//TODO: actual user id for sending reviews
-//TODO: display username instead of user id
-//TODO: fix image stretching issue
-
+//TODO: actual user id for sending reviews 
+//TODO: re-fetch reviews to display the one just added
 
 export default function MoviePage() {
     const [reviewContent, setReviewContent] = useState('');
@@ -50,7 +49,7 @@ export default function MoviePage() {
         console.log('Content:', reviewContent);
         console.log('Rating:', reviewRating);
         addReview(2, movieId, reviewContent, ratingToSend);
-        //TODO: re-fetch reviews to display the one just added
+       
     };
 
     return (
@@ -58,7 +57,17 @@ export default function MoviePage() {
             {movieInfo && movieInfo.title ? (
                 <Card>
                     <Stack direction="row">
-                        <img src={`https://image.tmdb.org/t/p/original/${movieInfo.poster_path}`} alt="Movie Image" width="512px" />
+                        
+                        <CardMedia
+                                        component="img"
+                                        alt="Movie poster image"
+                                        width="512"
+                                        image={`https://image.tmdb.org/t/p/original/${movieInfo.poster_path}`}
+                                        sx={{
+                                            maxWidth: '40%',
+                                            height: 'auto',
+                                        }}
+                                    />
                         <CardContent>
                             <Stack direction="row" spacing={2}>
                                 <Stack>
@@ -112,7 +121,7 @@ export default function MoviePage() {
                                 <CardContent>
                                     <Stack direction="row">
                                         <Typography flexGrow={1} variant="h6">
-                                            Review by User {review.user_id}
+                                            Review by {review.username}
                                         </Typography>
                                         {review.rating !== null && <Rating readOnly value={review.rating} />}
                                     </Stack>

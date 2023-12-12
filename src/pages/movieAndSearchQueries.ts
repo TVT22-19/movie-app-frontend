@@ -39,8 +39,23 @@ const fetchReviewsByMovieId = async (id: number): Promise <Review[]> => {
     if (!response.ok) {
         throw new Error('Failed to fetch movie data');
     }
-    return response.json();
+    const reviews = await response.json();
+
+    const userIds = reviews.map((review: Review)=> review.user_id);
+
+    // user information for each user ID
+    const users = await Promise.all(
+        userIds.map((userId: number) => fetch(`${hostUrl}/users/${userId}`).then(response => response.json()))
+    );
+
+    const reviewsWithUsernames = reviews.map((review: Review, index: number) => ({
+        ...review,
+        username: users[index].username, // Assuming the response has a 'username' property
+    }));
+
+    return reviewsWithUsernames;
 };
+
 
 export const useFetchReviewsByMovieId = (movieId: number) => useQuery< Review[], Error>({
     queryKey: ["fetchreviewsbymovieid", movieId],
