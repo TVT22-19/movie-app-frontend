@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-const hostUrl: string = "http://localhost:3001";
 import { Movie, TVSeries, Review } from "./types";
+
+const hostUrl: string = "http://localhost:3001";
 
 export const fetchMedia = async (query: string, isMovie: boolean) => {
     if (!query) {
@@ -18,9 +19,11 @@ export const fetchMedia = async (query: string, isMovie: boolean) => {
 
 const fetchMovieData = async (id: number): Promise <Movie> => {
     const response = await fetch(`${hostUrl}/moviedb/${id}`);
+
     if (!response.ok) {
         throw new Error('Failed to fetch movie data');
     }
+
     return response.json();
 };
 
@@ -44,3 +47,21 @@ export const useFetchReviewsByMovieId = (movieId: number) => useQuery< Review[],
     queryFn: () => fetchReviewsByMovieId(movieId),
 
 })
+
+
+export const addReview = async (userID: number, movieID:number, content: string, rating: number) => {
+    const response = await fetch(`${hostUrl}/review`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userID, movieID, content}), //until backend is edited
+      //body: JSON.stringify({ userID, movieID, content, rating}),
+    });
+  
+    if (!response.ok) {
+        throw new Error('Failed to add review');
+    }
+  
+    return response.json();
+  };

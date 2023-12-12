@@ -10,17 +10,24 @@ import {
     Rating,
     Stack,
     Typography,
-    Box
+    Box,
+    IconButton
 } from "@mui/material";
 import { useAuth } from "../hooks/useAuth.tsx";
-import { useFetchMovieData, useFetchReviewsByMovieId } from "./movieAndSearchQueries.ts";
+import SendIcon from '@mui/icons-material/Send';
+import { useFetchMovieData, useFetchReviewsByMovieId, addReview } from "./movieAndSearchQueries.ts";
 import MovieRating from "./MovieRating.tsx";
+import { useState } from "react";
 
-const hostUrl: string = "http://localhost:3001"
-
+//TODO: display rating on reviews
+//TODO: actual user id for sending reviews
+//TODO: display username instead of user id
+//TODO: fix image stretching issue
 
 
 export default function MoviePage() {
+    const [reviewContent, setReviewContent] = useState('');
+    const [reviewRating, setReviewRating] = useState<number | null>(0);
 
     const { isAuthorized } = useAuth()
 
@@ -38,6 +45,13 @@ export default function MoviePage() {
         return <div>Error loading movie data</div>;
     }
 
+    const handleAddReview = async () => {
+        const ratingToSend = reviewRating ?? 0;
+        console.log('Content:', reviewContent);
+        console.log('Rating:', reviewRating);
+        addReview(2, movieId, reviewContent, ratingToSend);
+        //TODO: re-fetch reviews to display the one just added
+    };
 
     return (
         <Stack spacing={2}>
@@ -75,31 +89,39 @@ export default function MoviePage() {
                                 <OutlinedInput
                                     endAdornment={
                                         <InputAdornment position="end">
-                                            <Rating />
+                                            <Rating
+                                                value={reviewRating}
+                                                onChange={(event, newValue) => setReviewRating(newValue)}
+                                            />
+                                            <IconButton onClick={handleAddReview} edge="end">
+                                                <SendIcon />
+                                            </IconButton>
                                         </InputAdornment>
                                     }
-                                    label="Comment"
+                                    label="Review"
+                                    value={reviewContent}
+                                    onChange={(event) => setReviewContent(event.target.value)}
                                 />
                             </FormControl>
                         </Card>
                     )}
 
-                    {reviewData? (
-                        reviewData.map((review) => (
+                    {!reviewError ? (
+                        reviewData?.map((review) => (
                             <Card key={review.id}>
                                 <CardContent>
                                     <Stack direction="row">
                                         <Typography flexGrow={1} variant="h6">
-                                            {review.id}. Review by User {review.user_id}
+                                            Review by User {review.user_id}
                                         </Typography>
-                                        {review.rating !== null && <Rating readOnly value={review.rating}  />}
+                                        {review.rating !== null && <Rating readOnly value={review.rating} />}
                                     </Stack>
                                     <Typography variant="body2">{review.content}</Typography>
                                 </CardContent>
                             </Card>
                         ))
                     ) : (
-                        <Typography variant="h6">No reviews</Typography>
+                        <Typography variant="h6">Error loading reviews</Typography>
                     )}
                 </Card>
             ) : (
