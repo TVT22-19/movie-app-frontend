@@ -5,7 +5,8 @@ export interface User {
     firstname?: string,
     lastname?: string,
     age?: number,
-    registration_date?: string
+    registration_date?: string,
+    avatarURL?: string
 }
 
 export interface Group {
