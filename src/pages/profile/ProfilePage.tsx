@@ -10,6 +10,8 @@ import {useReviews} from "../../services/reviews.ts"
 
 export default function ProfilePage() {
 
+    const {state} = useLocation()
+
     const [openEditDialog, setOpenEditDialog] = useState(false);
 
     const profileId = Number(useParams().id)
@@ -36,12 +38,11 @@ export default function ProfilePage() {
 
     if(reviewStatus === "success"){
         console.log(`Found review with ID: ${profileId}`)
-        console.log(reviewData)
     }
 
     return (
         <>
-            <ProfileEditDialog open={openEditDialog} setOpen={setOpenEditDialog}/>
+            <ProfileEditDialog open={openEditDialog} setOpen={setOpenEditDialog} user={userData!} />
             <Stack spacing={2}>
                 <Card>
                     <CardContent>
@@ -71,7 +72,7 @@ export default function ProfilePage() {
                 <Divider/>
 
                 <Typography variant="h4" textAlign="center">Reviews</Typography>
-                {reviewData!.map((data) =>
+                {!reviewData? reviewData!.map((data) =>
                     <Card>
                         <CardContent>
                             <Stack spacing={2} direction="row" alignSelf="start">
@@ -82,7 +83,13 @@ export default function ProfilePage() {
                             </Stack>
                         </CardContent>
                     </Card>
-                )}
+                ) : <Card>
+                        <CardContent>
+                            <Stack>
+                                No reviews yet
+                            </Stack>
+                        </CardContent>
+                    </Card>}
             </Stack>
         </>
     )
