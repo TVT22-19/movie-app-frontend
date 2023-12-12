@@ -27,7 +27,7 @@ export default function ProfilePage() {
     }
 
     if(userStatus === "success"){
-        console.log(`Found user with ID: ${profileId}`)
+        console.log("User data retrieved")
     }
 
     if(reviewStatus === "pending") return (<h1>Loading...</h1>)
@@ -37,7 +37,7 @@ export default function ProfilePage() {
     }
 
     if(reviewStatus === "success"){
-        console.log(`Found review with ID: ${profileId}`)
+        console.log("Reviews retrieved successfully")
     }
 
     return (
@@ -72,7 +72,7 @@ export default function ProfilePage() {
                 <Divider/>
 
                 <Typography variant="h4" textAlign="center">Reviews</Typography>
-                {!reviewData? reviewData!.map((data) =>
+                {reviewData?.length! > 0 ? reviewData?.map((data) =>
                     <Card>
                         <CardContent>
                             <Stack spacing={2} direction="row" alignSelf="start">

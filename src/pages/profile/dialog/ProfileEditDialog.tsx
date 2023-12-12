@@ -4,43 +4,48 @@ import {ProfileEditDialogProps} from "./types.ts";
 
 import {User} from "../../../services/types.ts"
 import {useUpdateUser} from "../../../services/users.ts"
+import {useAuth} from "../../../hooks/useAuth.tsx";
 
 export default function ProfileEditDialog(props: ProfileEditDialogProps) {
 
-    const [user, setUser] = useState<User>(props.user)
+    const [user, setUser] = useState<User>()
 
-    const [username, setUsername] = useState<string>(user.username || "")
-    const [password, setPassword] = useState<string>(user.password || "")
-    const [age, setAge] = useState<number>(user.age || 0)
-    const [firstname, setFirstname] = useState<string>(user.firstname || "")
-    const [lastname, setLastname] = useState<string>(user.lastname || "")
-    const [avatarURL, setAvatarURL] = useState<string>(user.avatarURL || "")
+    const [username, setUsername] = useState<string>(props.user.username || "")
+    const [password, setPassword] = useState<string>(props.user.password || "")
+    const [age, setAge] = useState<number>(props.user.age || 0)
+    const [firstname, setFirstname] = useState<string>(props.user.firstname || "")
+    const [lastname, setLastname] = useState<string>(props.user.lastname || "")
+    const [avatarURL, setAvatarURL] = useState<string>(props.user.avatarURL || "")
 
     const {data, status, error} = useUpdateUser(user)
 
-    if(status === "pending") return (<h1>Loading...</h1>)
+    const {isAuthorized, setToken} = useAuth()
+    
+    if(status === "pending" && user) return (<h1>Loading...</h1>)
 
-    if(status === "error"){
+    if(status === "error" && user){
         console.log(error.message, {variant: "error"})
     }
 
-    if(status === "success"){
+    if(status === "success" && user){
+        if(data.token != null) setToken(data.token)
         console.log("Updated successfully!")
-        console.log(data)
     }
-
+    
     function updateUser(username: string, password: string, age: number,
                         firstname: string, lastname: string, avatarURL: string){
         setUser({
-            id: user.id,
+            id: props.user.id,
             username: username,
             password: password,
-            registration_date: user.registration_date,
+            registration_date: props.user.registration_date,
             age: age,
             firstname: firstname,
             lastname: lastname,
             avatarURL: avatarURL
         })
+
+        props.setOpen(false)
     }
 
     return (
