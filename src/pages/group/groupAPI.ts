@@ -22,18 +22,24 @@ export const fetchDiscussionPosts = async (groupId: number): Promise <Post[]> =>
 }
 
 export const createDiscussionPost = async (title: string, content: string, groupID: number, userID: number) => {
+    try {
+        const response = await fetch(`${hostUrl}/group-post/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ title, userID, groupID, content })
+        });
 
-    const response = await fetch(`${hostUrl}/group-post/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title, userID, groupID, content })
-    });
+        if (!response.ok) {
+            throw new Error((await response.json()).message);
+        }
 
-    if (response.status !== 201) throw new Error((await response.json()).message);
-
-    return await response.json();
+        return await response.json();
+    } catch (error) {
+        console.error('Error in createDiscussionPost:', error);
+        throw error;
+    }
 }
 
 
