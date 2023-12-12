@@ -45,7 +45,7 @@ export const getReviews = async (user_id: number): Promise<Reviews[]> => {
     return await response.json() as Reviews[]
 }
 
-export const updateUser = async (user: User): Promise<User> => {
+export const updateUser = async (user: User): Promise<AuthObject> => {
     const response = await fetch(`${hostUrl}/users/update`, {
         method: "POST", headers: {
             "Content-Type": "application/json"
@@ -62,11 +62,5 @@ export const updateUser = async (user: User): Promise<User> => {
 
     if (response.status !== 200) throw new Error((await response.json()).message)
 
-    const jsonResponse = response.json()
-
-    console.log("updateUser jsonResponse:")
-    console.log(jsonResponse)
-
-    return await jsonResponse
-    //response.json()
+    return await response.json() as AuthObject
 }
