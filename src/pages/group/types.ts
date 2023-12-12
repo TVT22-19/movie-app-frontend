@@ -9,6 +9,17 @@ export interface Member {
     username: string;
     avatar: string;
 }
+export interface GroupUser {
+    user_id: number;
+    group_id: number;
+    name: string;
+    
+}
+export interface FetchGroupsResult {
+    data?: GroupUser[];
+    error?: Error;
+    isLoading: boolean;
+  }
 
 export interface Post {
     user_id: number;

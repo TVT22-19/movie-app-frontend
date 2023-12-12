@@ -1,5 +1,5 @@
 
-import { GroupData, Member, Post } from "./types.ts";
+import { GroupData, GroupUser, Member, Post } from "./types.ts";
 
 const hostUrl: string = "http://localhost:3001"
 
@@ -73,3 +73,32 @@ export const checkOwnership = async (userId: number, groupId: number) => {
     return await response.json();
 }
 
+export const fetchGroupsByUser = async (userId: number):Promise <GroupUser[]> => {
+    try {
+      const response = await fetch(`${hostUrl}/group/groupsbyuser/${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch groups user is part of');
+      }
+      const groupsData = await response.json();
+  
+  //to add group names
+      const groupDetailsPromises = groupsData.map(async (group:GroupUser) => {
+        const groupDetailsResponse = await fetch(`${hostUrl}/group/${group.group_id}`);
+        if (!groupDetailsResponse.ok) {
+          throw new Error(`Failed to fetch details for group ${group.group_id}`);
+        }
+        const groupDetails = await groupDetailsResponse.json();
+        console.log(groupDetails);
+        
+        return { ...group, name: groupDetails.name };
+      });
+  
+      const groupsWithDetails = await Promise.all(groupDetailsPromises);
+     console.log("groupswithdetails:",groupsWithDetails);
+      return groupsWithDetails as GroupUser[];
+
+    } catch (error) {
+      throw new Error(`Error fetching groups`);
+    }
+  };
+  

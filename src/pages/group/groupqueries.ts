@@ -1,6 +1,6 @@
 import {useQuery} from "@tanstack/react-query";
-import {GroupData, Member, Post} from "./types"
-import {fetchGroupInfo, fetchMembers, fetchDiscussionPosts, createDiscussionPost, removeMember, checkMembership, checkOwnership} from "./groupAPI"
+import {GroupData, GroupUser, Member, Post} from "./types"
+import {fetchGroupInfo, fetchMembers, fetchDiscussionPosts, createDiscussionPost, removeMember, checkMembership, checkOwnership, fetchGroupsByUser} from "./groupAPI"
 
 export const useFetchMembers = (groupId: number) => useQuery<Member[], Error>({
     queryKey: ["fetchmembers", groupId],
@@ -44,4 +44,10 @@ export const useCheckOwnership = (userId: number, groupId: number) => useQuery< 
     queryFn: () => checkOwnership(userId, groupId),
     
 })
+export const useFetchGroupsByUser = (userId: number) => useQuery< GroupUser[] , Error>({
+    queryKey: ["fetchgroupsbyuser", userId],
+    queryFn: () => fetchGroupsByUser(userId),
+    
+})
+
 
