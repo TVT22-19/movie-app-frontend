@@ -2,11 +2,28 @@ import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextFi
 import {useState} from "react"
 import {ProfileDeleteDialogProps} from "./types.ts";
 
-import {User} from "../../../services/types.ts"
-import {useUpdateUser} from "../../../services/users.ts"
+import {useDeleteUser} from "../../../services/users.ts"
 import {useAuth} from "../../../hooks/useAuth.tsx";
+import {useNavigate} from "react-router-dom";
 
 export default function ProfileDeleteDialog(props: ProfileDeleteDialogProps) {
+
+    const deleteUserMutation = useDeleteUser()
+
+    const navigate = useNavigate()
+
+    const {isAuthorized, setToken} = useAuth()
+
+    if(deleteUserMutation.isError){
+        console.log(deleteUserMutation.error)
+    }
+
+    function afterDeletion(){
+        props.setOpen(false)
+        setToken("")
+        navigate("/")
+    }
+
     return (
         <Dialog
             open={props.open}
@@ -19,7 +36,12 @@ export default function ProfileDeleteDialog(props: ProfileDeleteDialogProps) {
             </DialogTitle>
             <DialogActions>
                 <Button onClick={() => props.setOpen(false)}>Cancel</Button>
-                <Button variant="contained" onClick={() => props.setOpen(false)} autoFocus color="error">
+                <Button variant="contained" onClick={() => {
+                    deleteUserMutation.mutate((props.user.id!), {
+                        onSuccess: () => console.log("User deleted"),
+                        onSettled: () => afterDeletion()
+                    })
+                }} autoFocus color="error">
                     Yes
                 </Button>
             </DialogActions>

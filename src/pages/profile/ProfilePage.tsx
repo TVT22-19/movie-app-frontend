@@ -3,9 +3,9 @@ import {Navigate, useParams, useLocation} from "react-router-dom";
 import {ContentPasteSearchOutlined, DateRange, Delete, Edit,} from "@mui/icons-material";
 import {useState} from "react";
 import ProfileEditDialog from "./dialog/ProfileEditDialog.tsx";
+import ProfileDeleteDialog from "./dialog/ProfileDeleteDialog.tsx";
 
 import {useUser} from "../../services/users.ts"
-import {User, Reviews} from "../../services/types.ts"
 import {useReviews} from "../../services/reviews.ts"
 
 export default function ProfilePage() {
@@ -13,6 +13,7 @@ export default function ProfilePage() {
     const {state} = useLocation()
 
     const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const profileId = Number(useParams().id)
     if (Number.isNaN(profileId)) return <Navigate to="/page-not-found"/>
@@ -39,10 +40,11 @@ export default function ProfilePage() {
     if(reviewStatus === "success"){
         console.log("Reviews retrieved successfully")
     }
-
+    
     return (
         <>
             <ProfileEditDialog open={openEditDialog} setOpen={setOpenEditDialog} user={userData!} />
+            <ProfileDeleteDialog open={openDeleteDialog} setOpen={setOpenDeleteDialog} user={userData!}/>
             <Stack spacing={2}>
                 <Card>
                     <CardContent>
@@ -61,7 +63,7 @@ export default function ProfilePage() {
                                 <IconButton onClick={() => setOpenEditDialog(true)}>
                                     <Edit/>
                                 </IconButton>
-                                <IconButton>
+                                <IconButton onClick={() => setOpenDeleteDialog(true)} >
                                     <Delete color="error"/>
                                 </IconButton>
                             </Stack>
