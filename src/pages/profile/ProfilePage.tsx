@@ -5,8 +5,10 @@ import {useState} from "react";
 import ProfileEditDialog from "./dialog/ProfileEditDialog.tsx";
 import ProfileDeleteDialog from "./dialog/ProfileDeleteDialog.tsx";
 
+import {User} from "../../services/types.ts";
 import {useUser} from "../../services/users.ts"
 import {useReviews} from "../../services/reviews.ts"
+import {useAuth} from "../../hooks/useAuth.tsx";
 
 export default function ProfilePage() {
 
@@ -15,8 +17,12 @@ export default function ProfilePage() {
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
+    const {isAuthorized, getToken} = useAuth()
+
     const profileId = Number(useParams().id)
     if (Number.isNaN(profileId)) return <Navigate to="/page-not-found"/>
+
+    const isProfileOwner = JSON.parse(atob(getToken()!.split(".")[1])).userId === profileId
 
     const {data: userData, status: userStatus, error: userError} = useUser(profileId)
     const {data: reviewData, status: reviewStatus, error: reviewError} = useReviews(profileId)
@@ -59,14 +65,14 @@ export default function ProfilePage() {
                                 <Typography>Age: {userData?.age}</Typography>
                                 <Typography>Registered: {new Date(userData?.registration_date!!).toLocaleDateString()}</Typography>
                             </Stack>
-                            <Stack>
+                            { isProfileOwner! ? <Stack>
                                 <IconButton onClick={() => setOpenEditDialog(true)}>
                                     <Edit/>
                                 </IconButton>
                                 <IconButton onClick={() => setOpenDeleteDialog(true)} >
                                     <Delete color="error"/>
                                 </IconButton>
-                            </Stack>
+                            </Stack> : <></>}
                         </Stack>
                     </CardContent>
                 </Card>
