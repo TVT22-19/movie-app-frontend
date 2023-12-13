@@ -1,4 +1,4 @@
-import {Navigate, useParams} from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import {
     Card,
     CardContent,
@@ -9,61 +9,223 @@ import {
     OutlinedInput,
     Rating,
     Stack,
-    Typography
+    Typography,
+    Box,
+    IconButton,
+    CardMedia,
+    FormLabel,
+    RadioGroup,
+    FormControlLabel,
+    Radio,
+    Button,
+    useTheme
 } from "@mui/material";
-import {useAuth} from "../hooks/useAuth.tsx";
+import { useAuth } from "../hooks/useAuth.tsx";
+import SendIcon from '@mui/icons-material/Send';
+import { useFetchMovieData, useFetchReviewsByMovieId, addReview } from "./movieAndSearchQueries.ts";
+import MovieRating from "./MovieRating.tsx";
+import { useEffect, useState } from "react";
+import { Review } from "./types.ts";
+import { User } from "../services/types.ts";
+
 
 export default function MoviePage() {
+    const [reviewContent, setReviewContent] = useState('');
+    const [reviewRating, setReviewRating] = useState<number | null>(0);
+    const [sortOption, setSortOption] = useState<'chronological' | 'rating'>('chronological');
+    const [sortedReviews, setSortedReviews] = useState<Review[] | null>([]);
 
-    const {isAuthorized} = useAuth()
+    const { isAuthorized, getToken } = useAuth()
+    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
-    const groupId = Number(useParams().id)
-    if (Number.isNaN(groupId)) return <Navigate to="/page-not-found"/>
+    const movieId = Number(useParams().id)
+    if (Number.isNaN(movieId)) return <Navigate to="/page-not-found" />
 
+    const { data: movieInfo, error: infoError, isLoading: infoLoading } = useFetchMovieData(movieId);
+    const { data: reviewData, error: reviewError, isLoading: reviewLoading, refetch: refetchReviews } = useFetchReviewsByMovieId(movieId);
+
+  
+
+    const handleAddReview = async () => {
+
+        try {
+            const ratingToSend = reviewRating ?? 0;
+            console.log('Content:', reviewContent);
+            console.log('Rating:', reviewRating);
+            if (user?.userId !== undefined) {
+                await addReview(user.userId, movieId, reviewContent, ratingToSend);
+                setReviewContent('');
+                setReviewRating(0);
+                refetchReviews();
+            } else {
+                console.log("User ID undefined")
+            }
+
+        } catch (error) {
+            console.error("Error adding review", error);
+        }
+
+    };
+
+
+
+    const handleSortChange = (newSortOption: 'chronological' | 'rating') => {
+
+        console.log(newSortOption);
+        if (reviewData) {
+            if (newSortOption === 'chronological') {
+                const reviewsCopy = [...reviewData];
+
+                reviewsCopy.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                setSortedReviews(reviewsCopy);
+            }
+            else if (newSortOption == 'rating') {
+                const reviewsCopy = [...reviewData];
+
+                reviewsCopy.sort((a, b) => {
+                    const ratingA = a.rating ?? 0;
+                    const ratingB = b.rating ?? 0;
+                    return ratingB - ratingA;
+                });
+                setSortedReviews(reviewsCopy);
+            }
+        }
+    };
+    useEffect(() => {
+
+        handleSortChange('chronological');
+    }, [reviewData]);
+
+    useEffect(() => {//otherwise the old choice stays displayed upon reloading the page
+        setSortOption('chronological'); 
+    }, []);
+
+    const theme = useTheme();
+
+    if (infoLoading || reviewLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (infoError) {
+        return <div>Error loading movie data</div>;
+    }
 
     return (
         <Stack spacing={2}>
-            <Card>
-                <Stack direction="row">
-                    <img src="https://dummyimage.com/1000/000000/ffffff" alt="Movie Image" width="512px"/>
-                    <CardContent>
-                        <Stack direction="row" spacing={2}>
-                            <Stack>
-                                <Typography variant="h4">Movie title</Typography>
-                                <Typography variant="h6">Year: 2023</Typography>
-                                <Rating readOnly value={3}/>
-                                <Divider style={{paddingBottom: 16}}/>
-                                <Typography variant="body1" style={{paddingTop: 16}}>Movie description</Typography>
-                            </Stack>
-                        </Stack>
-                    </CardContent>
-                </Stack>
-            </Card>
-
-            <Divider/>
-
-            {isAuthorized && <FormControl variant="outlined">
-                <InputLabel>Comment</InputLabel>
-                <OutlinedInput endAdornment={
-                    <InputAdornment position="end">
-                        <Rating/>
-                    </InputAdornment>
-                } label="Comment"/>
-            </FormControl>}
-
-            {[1, 2, 3].map(value => (
+            {movieInfo && movieInfo.title !== undefined ? (
                 <Card>
-                    <CardContent>
-                        <Stack direction="row">
-                            <Typography flexGrow={1} variant="h6">{value}. Spider-man Across The JavaScript</Typography>
-                            <Rating value={Math.random() * (5 - 1) + 1}/>
-                        </Stack>
-                        <Typography variant="body2">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-                            blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur, neque
-                            doloribus.</Typography>
-                    </CardContent>
+                    <Stack direction="row">
+
+                        <CardMedia
+                            component="img"
+                            alt="Movie poster image"
+                            width="512"
+                            image={`https://image.tmdb.org/t/p/original/${movieInfo.poster_path}`}
+                            sx={{
+                                maxWidth: '40%',
+                                height: 'auto',
+                            }}
+                        />
+                        <CardContent>
+                            <Stack direction="row" spacing={2}>
+                                <Stack>
+                                    <Typography variant="h4">{movieInfo.title}</Typography>
+                                    {movieInfo.release_date && (
+                                        <Typography variant="h6">Year: {new Date(movieInfo.release_date).getFullYear()}</Typography>
+                                    )}
+                                    {movieInfo.vote_average !== undefined ? (
+                                        <MovieRating voteAverage={movieInfo.vote_average} />
+                                    ) : (
+                                        <Typography variant="body2">No rating available</Typography>
+                                    )}
+                                    <Divider style={{ paddingBottom: 16 }} />
+                                    <Typography variant="body1" style={{ paddingTop: 16 }}>
+                                        {movieInfo.overview}
+                                    </Typography>
+                                </Stack>
+                            </Stack>
+                        </CardContent>
+                    </Stack>
+
+                    <Box mt={4} />
+
+                    {isAuthorized && (
+                        <Card>
+                            <FormControl variant="outlined" fullWidth>
+                                <InputLabel>Add review</InputLabel>
+                                <OutlinedInput
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <Rating
+                                                value={reviewRating}
+                                                onChange={(event, newValue) => setReviewRating(newValue)}
+                                            />
+                                            <IconButton onClick={handleAddReview} edge="end">
+                                                <SendIcon />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Review"
+                                    value={reviewContent}
+                                    onChange={(event) => setReviewContent(event.target.value)}
+                                />
+                            </FormControl>
+                        </Card>
+                    )}
+
+                    <Box mt={2} />
+                    <div>
+
+                        {reviewData && reviewData.length > 0 ? (
+                            <Card style={{ padding: '16px' }}>
+                                <FormControl component="fieldset">
+                                    <FormLabel component="legend">Sort Order</FormLabel>
+                                    <RadioGroup
+                                        row
+                                        aria-label="sort-order"
+                                        name="sort-order"
+                                        value={sortOption}
+                                        onChange={(e) => {
+                                            const chosenValue = e.target.value as 'chronological' | 'rating';
+                                            setSortOption(chosenValue);
+                                            handleSortChange(chosenValue);
+                                        }}
+                                    >
+                                        <FormControlLabel value="chronological" control={<Radio />} label="Chronological" />
+                                        <FormControlLabel value="rating" control={<Radio />} label="By Rating" />
+                                    </RadioGroup>
+                                </FormControl>
+                            </Card>
+
+                        ) : (
+                            <Typography style={{ padding: '16px' }}>No reviews</Typography>
+                        )}
+                    </div>
+
+                    {!reviewError ? (
+                        (sortedReviews && sortedReviews.length > 0 ? sortedReviews : reviewData)?.map((review) => (
+                            <Card key={review.id}>
+                                <CardContent>
+                                    <Stack direction="row">
+                                        <Typography flexGrow={1} variant="h6">
+                                            Review by {review.username}
+                                        </Typography>
+                                        {review.rating !== null && <Rating readOnly value={review.rating} />}
+                                    </Stack>
+                                    <Typography variant="body2">{review.content}</Typography>
+                                    <Typography style={{ color: theme.palette.text.secondary }}>
+                                        <small>Review submitted on: {new Date(review.timestamp).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} </small>
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        ))
+                    ) : (
+                        <Typography variant="h6">Error loading reviews</Typography>
+                    )}
                 </Card>
-            ))}
+            ) : (
+                <Typography variant="h6">No movie found</Typography>
+            )}
         </Stack>
     )
-}
+};

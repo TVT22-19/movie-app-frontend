@@ -11,19 +11,25 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import {Check, Close, Group} from "@mui/icons-material";
-import {useGroupInvites, useGroups} from "../../../services/groups.ts";
-import {useAuth} from "../../../hooks/useAuth.tsx";
-import {useNavigate} from "react-router-dom";
+import { Group, Add } from "@mui/icons-material";
+import { useGroupInvites, useGroups } from "../../../services/groups.ts";
+import { useAuth } from "../../../hooks/useAuth.tsx";
+import { useNavigate } from "react-router-dom";
+import { useFetchGroupsByUser } from "../../group/groupqueries.ts";
+import { User } from "../../../services/types.ts";
+import { FetchGroupsResult, GroupUser } from "../../group/types.ts";
 
 export default function Sidebar() {
 
     const drawerWidth = 240;
 
-    const {isAuthorized} = useAuth()
+    const { isAuthorized, getToken } = useAuth();
+    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
+    const userId = user?.userId;
 
-    const {data: groups} = useGroups(isAuthorized)
-    const {data: groupInvites} = useGroupInvites(isAuthorized)
+    const { data: groups } = useGroups(isAuthorized)
+    const { data: groupInvites } = useGroupInvites(isAuthorized)
+    const { data: groupsData, error: groupsError, isLoading: groupsLoading } = useFetchGroupsByUser(userId || 0) as FetchGroupsResult;
 
     const navigate = useNavigate()
 
@@ -35,37 +41,27 @@ export default function Sidebar() {
                 boxSizing: 'border-box'
             },
         }}>
-            <Toolbar/>
-            <Box sx={{overflow: 'auto'}}>
+            <Toolbar />
+            <Box sx={{ overflow: 'auto' }}>
                 <List>
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={() => navigate('browsegroups')}>
+                            <ListItemIcon>
+                                <Add /> 
+                            </ListItemIcon>
+                            <ListItemText primary="Browse groups" />
+                        </ListItemButton>
+                    </ListItem>
                     {isAuthorized &&
                         <>
-                            {groupInvites?.map(group => (
-                                <ListItem key={group.id}>
-                                    <ListItemIcon>
-                                        <Group/>
-                                    </ListItemIcon>
-                                    <ListItemText primary={
-                                        <Typography overflow="hidden" textOverflow="ellipsis">
-                                            {group.name}
-                                        </Typography>
-                                    }/>
-                                    <IconButton style={{padding: 4}}>
-                                        <Check/>
-                                    </IconButton>
-                                    <IconButton edge="end" style={{padding: 4}}>
-                                        <Close/>
-                                    </IconButton>
-                                </ListItem>
-                            ))}
-                            <Divider/>
-                            {groups?.map(group => (
-                                <ListItem key={group.id} disablePadding>
-                                    <ListItemButton onClick={() => navigate(`group/${group.id}`)}>
+                            <Divider />
+                            {groupsData?.map(group => (
+                                <ListItem key={group.group_id} disablePadding>
+                                    <ListItemButton onClick={() => navigate(`group/${group.group_id}`)}>
                                         <ListItemIcon>
-                                            <Group/>
+                                            <Group />
                                         </ListItemIcon>
-                                        <ListItemText primary={group.name}/>
+                                        <ListItemText primary={group.name} />
                                     </ListItemButton>
                                 </ListItem>
                             ))}
