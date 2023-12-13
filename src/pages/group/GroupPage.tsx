@@ -49,13 +49,6 @@ export default function GroupPage() {
         setOpenRemoveMemberDialog(false);
     };
 
-    const handleRemoveConfirm = () => {
-
-        //use the useMutation to remove member based on this confirmation.. i don't know how :'D
-        setOpenRemoveMemberDialog(false);
-
-    };
-
     const handleCreatePost = async (title: string, content: string) => {
         try {
             console.log(title, content, groupId, userId);

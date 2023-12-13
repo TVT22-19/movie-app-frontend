@@ -13,13 +13,13 @@ export interface GroupUser {
     user_id: number;
     group_id: number;
     name: string;
-    
+
 }
 export interface FetchGroupsResult {
     data?: GroupUser[];
     error?: Error;
     isLoading: boolean;
-  }
+}
 
 export interface Post {
     user_id: number;
@@ -27,5 +27,11 @@ export interface Post {
     content: string;
     timestamp: Date;
     username: string;
+
+}
+
+export interface UserRemovalBody {
+    selectedUserId: number,
+    groupId: number,
 
 }

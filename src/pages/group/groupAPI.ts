@@ -1,5 +1,5 @@
 
-import { GroupData, GroupUser, Member, Post } from "./types.ts";
+import { GroupData, GroupUser, Member, Post, UserRemovalBody } from "./types.ts";
 
 const hostUrl: string = "http://localhost:3001"
 
@@ -51,12 +51,12 @@ export const fetchGroupInfo = async (groupId: number): Promise <GroupData> => {
 }
 
 
-export const removeMember = async (selectedUserId: number, groupId: number)=> {
-    const response = await fetch(`${hostUrl}/group/deletemember/${selectedUserId}/from/${groupId}`, {
+export const removeMember = async (userRemovalBody: UserRemovalBody):  Promise<string>=> {
+    const response = await fetch(`${hostUrl}/group/deletemember/${userRemovalBody.selectedUserId}/from/${userRemovalBody.groupId}`, {
         method: 'DELETE',
     });
     if (response.status !== 200) throw new Error((await response.json()).message); 
-    return await response.json();
+    return await response.json() as string;
 }
 
 export const checkMembership = async (userId: number, groupId: number) => {
