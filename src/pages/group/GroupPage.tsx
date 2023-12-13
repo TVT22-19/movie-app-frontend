@@ -26,7 +26,6 @@ import { User } from "../../services/types.ts";
 
 export default function GroupPage() {
 
-
     const { isAuthorized, getToken } = useAuth();
     let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
@@ -39,7 +38,7 @@ export default function GroupPage() {
     const groupId = Number(useParams().id)
     if (Number.isNaN(groupId)) return <Navigate to="/page-not-found" />
 
-
+    //TODO: limit news posts amount? 20 most recent or something
 
     const handleRemoveClick = (userId: number) => {
         setSelectedUserId(userId);
@@ -57,14 +56,14 @@ export default function GroupPage() {
 
     };
 
-    const handleCreatePost = (title: string, content: string) => {
+    const handleCreatePost = async (title: string, content: string) => {
         try {
             console.log(title, content, groupId, userId);
             if (userId !== undefined) {
-                const responseData = createDiscussionPost(title, content, groupId, userId);
+                const responseData = await createDiscussionPost(title, content, groupId, userId);
             }
 
-            // then refresh discussion posts - i wasn't sure how 
+            refetchPosts();
 
         } catch (error) {
             console.error('Error creating post', error);
@@ -75,7 +74,7 @@ export default function GroupPage() {
     //GET GROUP INFO, MEMBERS, POSTS
     const { data: groupInfoData, error: infoError, isLoading: infoLoading } = useFetchGroupInfo(groupId);
     const { data: membersData, error: membersError, isLoading: membersLoading } = useFetchMembers(groupId);
-    const { data: posts, error: postsError, isLoading: postsLoading } = useFetchDiscussionPosts(groupId);
+    const { data: posts, error: postsError, isLoading: postsLoading, refetch: refetchPosts } = useFetchDiscussionPosts(groupId);
 
     // CHECK OWNERSHIP/MEMBERSHIP
     const { data: isOwner, error: ownershipError, isLoading: ownershipLoading } = useCheckOwnership(userId || 0, groupId);
@@ -152,8 +151,9 @@ export default function GroupPage() {
 
 
                 {isMember ? (
+                    
                     <div>
-                        <Typography variant="h4">Discussion</Typography>
+                        <Typography variant="h5">Group News</Typography>
 
                         {posts && posts.length > 0 ? (
                             <Stack spacing={2}>
@@ -175,7 +175,7 @@ export default function GroupPage() {
                         ) : (
                             <Typography>No posts </Typography>
                         )}
-                        <Button onClick={() => setOpenCreatePostDialog(true)}> Create discussion post </Button>
+                        <Button onClick={() => setOpenCreatePostDialog(true)}> Create news post </Button>
 
                     </div>) : (
                     <Button> Request to join this group </Button>
