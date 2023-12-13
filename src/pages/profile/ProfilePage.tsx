@@ -1,23 +1,19 @@
-import {Avatar, Card, CardContent, Divider, IconButton, Stack, Typography} from "@mui/material";
-import {Navigate, useParams, useLocation} from "react-router-dom";
-import {ContentPasteSearchOutlined, DateRange, Delete, Edit,} from "@mui/icons-material";
+import {Alert, Avatar, Card, CardContent, Divider, IconButton, Stack, Typography} from "@mui/material";
+import {Navigate, useParams} from "react-router-dom";
+import {Delete, Edit,} from "@mui/icons-material";
 import {useState} from "react";
 import ProfileEditDialog from "./dialog/ProfileEditDialog.tsx";
 import ProfileDeleteDialog from "./dialog/ProfileDeleteDialog.tsx";
-
-import {User} from "../../services/types.ts";
 import {useUser} from "../../services/users.ts"
 import {useReviews} from "../../services/reviews.ts"
 import {useAuth} from "../../hooks/useAuth.tsx";
 
 export default function ProfilePage() {
 
-    const {state} = useLocation()
-
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-    const {isAuthorized, getToken} = useAuth()
+    const {getToken} = useAuth()
 
     const profileId = Number(useParams().id)
     if (Number.isNaN(profileId)) return <Navigate to="/page-not-found"/>
@@ -31,6 +27,7 @@ export default function ProfilePage() {
 
     if(userStatus === "error"){
         console.log(userError.message, {variant: "error"})
+        return <Alert severity="error">User not exist</Alert>
     }
 
     if(userStatus === "success"){

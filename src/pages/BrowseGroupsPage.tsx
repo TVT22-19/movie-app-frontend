@@ -1,68 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import {
-    Avatar, Card, CardContent, CardHeader, Stack, Typography, useTheme
-} from "@mui/material";
+import React from "react";
+import {useNavigate} from "react-router-dom";
+import {Avatar, Card, CardActionArea, CardHeader, Divider, Stack, Typography} from "@mui/material";
+import {useGroups} from "../services/groups.ts";
 
 export default function BrowseGroupsPage() {
-    const [groups, setGroups] = useState<GroupData[]>([]);
-    const theme = useTheme();
 
-    useEffect(() => {
-       
-        const fetchGroups = async () => {
-            try {
-                const response = await fetch("http://localhost:3001/group/allgroups");
-                const data = await response.json();
-                setGroups(data);
-            } catch (error) {
-                console.error("Error fetching groups", error);
-            }
-        };
-
-        fetchGroups();
-    }, []); 
+    const navigate = useNavigate()
+    const {data: groups} = useGroups()
 
     return (
         <>
-          <Card>
-                <CardHeader
-                    title="Browse All Groups"
-                    subheader="Click on the group name to open the group's page."
-                />
-                <CardContent>
-                    <Stack spacing={2}>
-                    {groups ? (
-        groups.map((group) => (
-            <Card key={group.id}>
-                <CardHeader
-                    avatar={<Avatar>{group.name.charAt(0)}</Avatar>}
-                    title={
-                        <Link
-                            to={`/group/${group.id}`}
-                            style={{ color: theme.palette.text.primary }}
-                        >
-                            {group.name}
-                        </Link>
-                    }
-                />
-            </Card>
-        ))
-    ) : (
-        <Typography variant="body2" color="textSecondary">
-            No groups available.
-        </Typography>
-    )}
-                    </Stack>
-                </CardContent>
-            </Card>
+            <Typography variant="h4">Browse All Groups</Typography>
+            <Typography variant="h6" paddingBottom={2}>Click on the group name to open the group's page</Typography>
+            <Stack spacing={2}>
+                <Divider/>
+                {groups ? (
+                    groups.map((group) => (
+                        <Card key={group.id}>
+                            <CardActionArea onClick={() => navigate(`/group/${group.id}`)}>
+                                <CardHeader avatar={
+                                    <Avatar>{group.name.charAt(0)}</Avatar>
+                                } title={group.name}/>
+                            </CardActionArea>
+                        </Card>
+                    ))
+                ) : (
+                    <Typography variant="body2" color="textSecondary">
+                        No groups available.
+                    </Typography>
+                )}
+            </Stack>
         </>
     );
 }
-
-interface GroupData {
-    id: number;
-    name: string;
-    description: string;
-    avatar_url: string;
-  }

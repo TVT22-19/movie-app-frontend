@@ -2,6 +2,9 @@ import TextField from "@mui/material/TextField";
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack} from "@mui/material";
 import {useState} from "react";
 import {CreateGroupDialogProps} from "./types.ts";
+import {useGroupCreate} from "../../../services/groups.ts";
+import {GroupCreationBody, User} from "../../../services/types.ts";
+import {useAuth} from "../../../hooks/useAuth.tsx";
 
 
 export default function GroupCreationDialog(props: CreateGroupDialogProps) {
@@ -9,6 +12,9 @@ export default function GroupCreationDialog(props: CreateGroupDialogProps) {
     const [groupName, setGroupName] = useState<string>("")
     const [groupDescription, setGroupDescription] = useState<string>("")
     const [groupAvatar, setGroupAvatar] = useState<string>("")
+
+    const createGroupMutation = useGroupCreate()
+    const {getToken} = useAuth()
 
     function createGroup(groupname: string, groupdesc: string, groupavatar: string) {
 
@@ -22,11 +28,14 @@ export default function GroupCreationDialog(props: CreateGroupDialogProps) {
             return
         }
 
-        //If all success
-        props.setOpen(false)
-
-        // Q: Limit description length?
-        // A: No...
+        createGroupMutation.mutate({
+            gname: groupname,
+            gdesc: groupdesc,
+            gavatar: groupavatar,
+            owner: (JSON.parse(atob(getToken()!.split('.')[1])) as User).userId
+        } as GroupCreationBody, {
+            onSuccess: () => props.setOpen(false)
+        })
     }
 
     return (

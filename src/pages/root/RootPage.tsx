@@ -34,6 +34,7 @@ import {useThemeSwitch} from "../../hooks/useThemeSwitch.tsx";
 import {StyledField} from "./components/StyledField.tsx";
 import Sidebar from "./components/Sidebar.tsx";
 import GroupCreationDialog from "./dialog/GroupCreationDialog.tsx";
+import {useAnswerToJoinRequest, useGroupInvites} from "../../services/groups.ts";
 
 export default function RootPage() {
 
@@ -42,12 +43,19 @@ export default function RootPage() {
     const theme = useTheme();
     const {toggleColorMode} = useThemeSwitch();
 
-    const {isAuthorized, setToken} = useAuth()
+    const {isAuthorized, setToken, getToken} = useAuth()
 
     const [profileAnchorEl, setProfileAnchorEl] = useState<null | HTMLElement>(null);
     const [notifyAnchorEl, setNotifyAnchorEl] = useState<null | HTMLElement>(null);
 
     const [openGroupCreateDialog, setOpenGroupCreateDialog] = useState(false)
+
+    const [buttonsDisabled, setButtonsDisabled] = useState(false)
+
+    const user = JSON.parse(atob(getToken()!.split(".")[1]))
+
+    const {data} = useGroupInvites(user.userId, isAuthorized)
+    const answerToJoinRequestMutation = useAnswerToJoinRequest()
 
     return (
         <Box sx={{display: 'flex'}}>
@@ -90,23 +98,43 @@ export default function RootPage() {
                                     }}
                                 >
                                     <Stack spacing={1}>
-                                        {[1, 2, 3, 4, 5, 6, 7].map(value => (
-                                            <Card>
-                                                <CardContent>
-                                                    <Typography variant="h6">Join Request</Typography>
-                                                    <Typography variant="body1">{value} group name...</Typography>
-                                                    <Typography variant="body1">username...</Typography>
-                                                </CardContent>
-                                                <CardActions disableSpacing style={{justifyContent: "space-evenly"}}>
-                                                    <IconButton>
-                                                        <Check/>
-                                                    </IconButton>
-                                                    <IconButton>
-                                                        <Cancel/>
-                                                    </IconButton>
-                                                </CardActions>
-                                            </Card>
-                                        ))}
+                                        {data ? data.map((group) =>
+                                            group.requests.map((user) => (
+                                                <Card>
+                                                    <CardContent>
+                                                        <Typography variant="h6">Join Request</Typography>
+                                                        <Typography variant="body1">Group: {group.group_id}</Typography>
+                                                        <Typography variant="body1">User: {user.user_id}</Typography>
+                                                    </CardContent>
+                                                    <CardActions disableSpacing
+                                                                 style={{justifyContent: "space-evenly"}}>
+                                                        <IconButton disabled={buttonsDisabled} onClick={() => {
+                                                            setButtonsDisabled(true)
+                                                            answerToJoinRequestMutation.mutate({
+                                                                userId: user.user_id,
+                                                                groupId: group.group_id,
+                                                                choice: true
+                                                            }, {
+                                                                onSettled: () => setButtonsDisabled(false)
+                                                            })
+                                                        }}>
+                                                            <Check/>
+                                                        </IconButton>
+                                                        <IconButton disabled={buttonsDisabled} onClick={() => {
+                                                            setButtonsDisabled(true)
+                                                            answerToJoinRequestMutation.mutate({
+                                                                userId: user.user_id,
+                                                                groupId: group.group_id,
+                                                                choice: false
+                                                            }, {
+                                                                onSettled: () => setButtonsDisabled(false)
+                                                            })
+                                                        }}>
+                                                            <Cancel/>
+                                                        </IconButton>
+                                                    </CardActions>
+                                                </Card>
+                                            ))) : <Typography variant="body2">Emtpy</Typography>}
                                     </Stack>
                                 </Menu>
                                 <IconButton size="large" color="inherit" onClick={
@@ -125,7 +153,7 @@ export default function RootPage() {
                                 >
                                     <MenuItem onClick={() => {
                                         setProfileAnchorEl(null)
-                                        navigate(`profile/1`);
+                                        navigate(`profile/${user.userId}`);
                                     }}>
                                         <ListItemIcon>
                                             <People fontSize="small"/>
