@@ -1,5 +1,6 @@
 import {
     Avatar,
+    Box,
     Button,
     Card,
     CardContent,
@@ -19,24 +20,29 @@ import { Navigate, useParams } from "react-router-dom";
 import PostCreationDialog from "./dialog/PostCreationDialog.tsx";
 import RemoveMemberDialog from "./dialog/RemoveMemberDialog.tsx";
 
-import { useCheckMembership, useCheckOwnership, useFetchDiscussionPosts, useFetchGroupInfo, useFetchMembers } from "./groupqueries.ts";
+import { useCheckMembership, useCheckOwnership, useFetchDiscussionPosts, useFetchGroupInfo, useFetchMembers, useCreateJoinRequest } from "./groupqueries.ts";
 import { createDiscussionPost } from "./groupAPI.ts";
+import { User } from "../../services/types.ts";
+import { JoinRequestBody } from "./types.ts";
 
 export default function GroupPage() {
 
-    const { getToken } = useAuth()
+    const createJoinRequestMutation = useCreateJoinRequest();
+
+    const { isAuthorized, getToken } = useAuth();
+    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
     const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
     const [openRemoveMemberDialog, setOpenRemoveMemberDialog] = useState(false);
-    const [groupNotFound, setGroupNotFound] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+    const [requestSent, setRequestSent] = useState(false);
 
-    const [userId, setUserId] = useState(1);
+    const userId = user?.userId;
 
     const groupId = Number(useParams().id)
     if (Number.isNaN(groupId)) return <Navigate to="/page-not-found" />
 
-
+    //TODO: limit news posts amount? 20 most recent or something
 
     const handleRemoveClick = (userId: number) => {
         setSelectedUserId(userId);
@@ -47,25 +53,18 @@ export default function GroupPage() {
         setOpenRemoveMemberDialog(false);
     };
 
-    const handleRemoveConfirm = () => {
-
-        //use the useMutation to remove member based on this confirmation.. i don't know how :'D
-        setOpenRemoveMemberDialog(false);
-
+    const handleRequestSent = () => {
+        setRequestSent(true);
     };
 
-    const handleCreatePost = (title: string, content: string) => {
-        //    this is more or less how it was, but i changed it to use the createDiscussionPost function instead of direct try-catch and fetch
+    const handleCreatePost = async (title: string, content: string) => {
         try {
+            console.log(title, content, groupId, userId);
+            if (userId !== undefined) {
+                const responseData = await createDiscussionPost(title, content, groupId, userId);
+            }
 
-            let userID = 1; // FOR NOW - fix once jwt available
-            console.log(userID, ' ', groupId);
-
-            //is it fine to do this? i'm not using the useQuery at all then
-
-            const responseData = createDiscussionPost(title, content, groupId, userID);
-
-            // then refresh discussion posts - i wasn't sure how 
+            refetchPosts();
 
         } catch (error) {
             console.error('Error creating post', error);
@@ -73,15 +72,14 @@ export default function GroupPage() {
 
     };
 
-
     //GET GROUP INFO, MEMBERS, POSTS
     const { data: groupInfoData, error: infoError, isLoading: infoLoading } = useFetchGroupInfo(groupId);
     const { data: membersData, error: membersError, isLoading: membersLoading } = useFetchMembers(groupId);
-    const { data: posts, error: postsError, isLoading: postsLoading } = useFetchDiscussionPosts(groupId);
+    const { data: posts, error: postsError, isLoading: postsLoading, refetch: refetchPosts } = useFetchDiscussionPosts(groupId);
 
     // CHECK OWNERSHIP/MEMBERSHIP
-    const { data: isOwner, error: ownershipError, isLoading: ownershipLoading } = useCheckOwnership(userId, groupId);
-    const { data: isMember, error: membershipError, isLoading: membershipLoading } = useCheckMembership(userId, groupId);
+    const { data: isOwner, error: ownershipError, isLoading: ownershipLoading } = useCheckOwnership(userId || 0, groupId);
+    const { data: isMember, error: membershipError, isLoading: membershipLoading } = useCheckMembership(userId || 0, groupId);
 
 
     if (membersLoading || postsLoading || infoLoading) {
@@ -101,13 +99,9 @@ export default function GroupPage() {
         return <div>Error fetching group info</div>;
     }
 
-    if (groupNotFound) {
-        console.log("Group not found");
-        return <Navigate to="/page-not-found" />;
-    }
 
     return (
-        <>
+        <div>
             <PostCreationDialog
                 open={openCreatePostDialog}
                 setOpen={setOpenCreatePostDialog}
@@ -131,7 +125,6 @@ export default function GroupPage() {
                 </Card>
 
                 <Typography variant="h5">Members:</Typography>
-
                 {membersData && membersData.length > 0 ? (
                     <Grid container>
                         {membersData.map((member) => (
@@ -141,10 +134,12 @@ export default function GroupPage() {
                                         <Stack spacing={2} direction="row" style={{ alignItems: "center" }}>
                                             <Avatar src={member.avatar} alt={member.username} />
                                             <Typography>{member.username}</Typography>
-                                            {/* Is owner? */}
-                                            <IconButton color="error" onClick={() => handleRemoveClick(member.id)}>
+                                            {isOwner ? (<IconButton color="error" onClick={() => handleRemoveClick(member.id)}>
                                                 <CancelIcon />
                                             </IconButton>
+                                            ) : (
+                                                <Box></Box>
+                                            )}
                                         </Stack>
                                     </CardContent>
                                 </Card>
@@ -155,40 +150,58 @@ export default function GroupPage() {
                     <Typography>No members found</Typography>
                 )}
 
-                {/*(isMember) && (*/}
-                <div>
-                    <Typography variant="h4">Discussion</Typography>
 
-                    {posts && posts.length > 0 ? (
-                        <Stack spacing={2}>
-                            {posts.map((post) => (
-                                <Card key={new Date(post.timestamp).getTime()}>
-                                    <CardContent>
-                                        <Typography variant="subtitle1">
-                                            <u><b>{post.title}</b></u>
-                                        </Typography>
-                                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                            <Typography
-                                                style={{ fontSize: "0.8rem" }}>{post.username} &bull; {new Date(post.timestamp).toLocaleString()} </Typography>
-                                        </div>
-                                        <Typography variant="body2">{post.content}</Typography>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </Stack>
-                    ) : (
-                        <Typography>No posts </Typography>
-                    )}
-                    <Button onClick={() => setOpenCreatePostDialog(true)}> Create discussion post </Button>
+                {isMember ? (
 
-                </div>
+                    <div>
+                        <Typography variant="h5">Group News</Typography>
+
+                        {posts && posts.length > 0 ? (
+                            <Stack spacing={2}>
+                                {posts.map((post) => (
+                                    <Card key={new Date(post.timestamp).getTime()}>
+                                        <CardContent>
+                                            <Typography variant="subtitle1">
+                                                <u><b>{post.title}</b></u>
+                                            </Typography>
+                                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                                <Typography
+                                                    style={{ fontSize: "0.8rem" }}>{post.username} &bull; {new Date(post.timestamp).toLocaleString()} </Typography>
+                                            </div>
+                                            <Typography variant="body2">{post.content}</Typography>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </Stack>
+                        ) : (
+                            <Typography>No posts </Typography>
+                        )}
+                        <Button onClick={() => setOpenCreatePostDialog(true)}> Create news post </Button>
+
+                    </div>) : (
+                        <div>
+
+                        {!requestSent ? (
+                        <Button variant="contained" onClick={() => {
+                        createJoinRequestMutation.mutate({
+                            userId: userId,
+                            groupId: groupId,
+                        } as JoinRequestBody, {
+                            onSuccess: () => console.log("Request sent", userId, groupId),
+                            onSettled: () => handleRequestSent()
+                        })
+                    }}
+                    >Request to join this group </Button>
 
 
-                {(!isMember) && (
-                    <Button> Request to join this group </Button>
+                        ): (
+                            <Typography> Request sent </Typography>
+                        )}
+                    
+                    </div>
                 )}
             </Stack>
-        </>
+        </div>
 
     )
 }

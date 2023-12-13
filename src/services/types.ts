@@ -1,5 +1,6 @@
 export interface User {
-    userId?: number,
+    id?: number,
+    userId?: number, //the jwt token contained the user id named as "userId", i don't know if "id" is a mistake or if it's used somewhere else 
     username: string,
     password?: string
     firstname?: string,

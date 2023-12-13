@@ -1,7 +1,9 @@
-import {alpha, InputBase, styled} from "@mui/material";
-import {Search as SearchIcon} from "@mui/icons-material";
+import { alpha, InputBase, styled, IconButton } from "@mui/material";
+import { Search as SearchIcon } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-const Search = styled('div')(({theme}) => ({
+const Search = styled('div')(({ theme }) => ({
     position: 'relative',
     flexGrow: 1,
     borderRadius: theme.shape.borderRadius,
@@ -18,7 +20,7 @@ const Search = styled('div')(({theme}) => ({
     },
 }));
 
-const SearchIconWrapper = styled('div')(({theme}) => ({
+const SearchIconWrapper = styled('div')(({ theme }) => ({
     padding: theme.spacing(0, 2),
     height: '100%',
     position: 'absolute',
@@ -28,13 +30,13 @@ const SearchIconWrapper = styled('div')(({theme}) => ({
     justifyContent: 'center',
 }));
 
-const StyledInputBase = styled(InputBase)(({theme}) => ({
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: 'inherit',
     width: '100%',
     '& .MuiInputBase-input': {
         padding: theme.spacing(1, 1, 1, 0),
         // vertical padding + font size from searchIcon
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+        paddingLeft: theme.spacing(2),
         transition: theme.transitions.create('width'),
         width: '100%',
         [theme.breakpoints.up('md')]: {
@@ -44,15 +46,33 @@ const StyledInputBase = styled(InputBase)(({theme}) => ({
 }));
 
 export function StyledField() {
+    const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState<string>('');
+
+    const handleSearch = () => {
+        if (searchQuery.trim() !== '') {
+
+            navigate(`/search/${encodeURIComponent(searchQuery)}`);
+        } else {
+
+            navigate('/search');
+        }
+    };
+
     return (
         <Search>
-            <SearchIconWrapper>
-                <SearchIcon/>
-            </SearchIconWrapper>
-            <StyledInputBase
-                placeholder="Search…"
-                inputProps={{'aria-label': 'search'}}
-            />
+            <div style={{ display: 'flex'}}>
+                <IconButton onClick={handleSearch}>
+                    <SearchIcon />
+                </IconButton>
+                <StyledInputBase
+                    placeholder="Search…"
+                    inputProps={{ 'aria-label': 'search' }}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()} 
+                />
+            </div>
         </Search>
     )
 }

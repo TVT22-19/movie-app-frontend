@@ -16,61 +16,37 @@ import {
     RadioGroup
 } from '@mui/material';
 
+import { Movie, TVSeries } from './types';
+import { fetchMedia } from './movieAndSearchQueries';
+import { useNavigate, useParams } from 'react-router-dom';
 
-//will be moved
-interface Movie {
-
-    adult: boolean;
-    backdrop_path: string;
-    genre_ids: number[];
-    id: number;
-    original_language: string;
-    original_title: string;
-    overview: string;
-    popularity: number;
-    poster_path: string;
-    release_date: string;
-    title: string;
-    video: boolean;
-    vote_average: number;
-    vote_count: number;
-
-}
-interface TVSeries extends Movie {
-    origin_country: string[];
-    first_air_date: string;
-    name: string;
-}
+//TODO: hide "clear rating" if rating is set to 0, make the clear rating and clear year buttons prettier
 
 const hostUrl: string = "http://localhost:3001"
 
-const fetchMedia = async (query: string, isMovie: boolean) => {
-    if (!query) {
-        return [];
-    }
-    
-    const mediaType = isMovie ? 'movie' : 'tv';
-    const response = await fetch(`${hostUrl}/moviedb/search/${mediaType}/${query}`);
-    
-    if (response.status !== 200) throw new Error((await response.json()).message);
-    
-    const data = await response.json();
-    return isMovie ? data.results : (data.results as TVSeries[]);
-}
 
 const SearchPage: React.FC = () => {
-    const [searchQuery, setSearchQuery] = useState<string>('');
+    const { query } = useParams(); 
+    const [searchQuery, setSearchQuery] = useState<string>(query || ''); 
     const [year, setYear] = useState<number>(0);
-    const [value, setValue] = React.useState<number | null>(2);
+    const [value, setValue] = React.useState<number | null>(0);
     const [isMovie, setIsMovie] = useState<boolean>(true); // default to searching for movies
     const [mediaResults, setMediaResults] = useState<(Movie | TVSeries)[] | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         setMediaResults(undefined);
     }, [isMovie]);
 
+    useEffect(() => {
+        if (query && query.trim() !== '') {
+            setSearchQuery(query);
+            handleSearch();
+        }
+    }, [query]);
 
 
     const handleSearch = async () => {
@@ -79,16 +55,16 @@ const SearchPage: React.FC = () => {
             const data = await fetchMedia(searchQuery, isMovie);
 
             const filteredMediaByYear = year !== 0
-                ? data.filter((media: Movie | TVSeries)=> {
+                ? data.filter((media: Movie | TVSeries) => {
                     const releaseDate = isMovie ? (media as Movie).release_date : (media as TVSeries).first_air_date;
                     return new Date(releaseDate).getFullYear() === year;
                 })
                 : data;
-    
+
             const filteredMedia = value !== null
                 ? filteredMediaByYear.filter((media: Movie | TVSeries) => media.vote_average >= value * 2) // scaling to convert 5 stars to 0-10 scale
                 : filteredMediaByYear;
-    
+
             setMediaResults(filteredMedia);
         } catch (error) {
             setIsError(true);
@@ -101,6 +77,10 @@ const SearchPage: React.FC = () => {
         setYear(0);
     };
 
+    const handleMovieClick = (movieId: number) => {
+        if (isMovie==true){
+        navigate(`/movie/${movieId}`);}
+      };
 
     const theme = useTheme();
 
@@ -121,7 +101,7 @@ const SearchPage: React.FC = () => {
                     <FormControlLabel value="movie" control={<Radio />} label="Movies" />
                     <FormControlLabel value="tv" control={<Radio />} label="TV Series" />
                 </RadioGroup>
-                
+
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
                         <TextField
@@ -145,7 +125,6 @@ const SearchPage: React.FC = () => {
                         />
 
 
-                        {/*ugly, ignore that for now*/}
                         {year !== 0 && (
 
                             <Button
@@ -169,7 +148,6 @@ const SearchPage: React.FC = () => {
                         {value !== null && (
                             <Button
                                 variant="outlined"
-            
                                 onClick={() => setValue(null)}
                             >
                                 Clear Rating
@@ -199,31 +177,33 @@ const SearchPage: React.FC = () => {
                     {isError && <div>Error loading movies</div>}
                     {mediaResults?.map((media) => (
                         <Grid item key={media.id} xs={12}>
-                            <Card sx={{ display: 'flex' }}>
-                                <CardMedia
-                                    component="img"
-                                    alt={isMovie ? (media as Movie).title : (media as TVSeries).name}
-                                    width="140"
-                                    image={`https://image.tmdb.org/t/p/original/${media.poster_path}`}
-                                    sx={{
-                                        flex: '10%',
-                                        maxWidth: '15%',
-                                        height: 'auto',
-                                    }}
-                                />
-                                <CardContent sx={{ flex: '90%' }}>
-                                    <Typography variant="h6">
-                                        {isMovie ? (media as Movie).title : (media as TVSeries).name}
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        Rating: {media.vote_average} / 10 | 
-                                        Year: {new Date(isMovie ? (media as Movie).release_date : (media as TVSeries).first_air_date).getFullYear()}
-                                        <br />
-                                        <br />
-                                        {media.overview}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
+                            <div onClick={() => handleMovieClick(media.id)} style={{ cursor: isMovie ? 'pointer' : 'default' }}>
+                                <Card sx={{ display: 'flex' }}>
+                                    <CardMedia
+                                        component="img"
+                                        alt={isMovie ? (media as Movie).title : (media as TVSeries).name}
+                                        width="140"
+                                        image={`https://image.tmdb.org/t/p/original/${media.poster_path}`}
+                                        sx={{
+                                            flex: '10%',
+                                            maxWidth: '15%',
+                                            height: 'auto',
+                                        }}
+                                    />
+                                    <CardContent sx={{ flex: '90%' }}>
+                                        <Typography variant="h6">
+                                            {isMovie ? (media as Movie).title : (media as TVSeries).name}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            Rating: {media.vote_average} / 10 |
+                                            Year: {new Date(isMovie ? (media as Movie).release_date : (media as TVSeries).first_air_date).getFullYear()}
+                                            <br />
+                                            <br />
+                                            {media.overview}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </Grid>
                     ))}
                 </Grid>
