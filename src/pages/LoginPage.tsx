@@ -32,7 +32,7 @@ export default function LoginPage() {
         if (data.token != null) setToken(data.token)
         setUser(undefined)
         console.log(`Welcome back ${user.username}`, {variant: "info"})
-        navigate("/profile")
+        navigate(`/profile/${data.user.id}`, {state: {id: data.user.id, username: username}})
     }
 
     function loginUser(username: string, password: string) {
@@ -42,6 +42,7 @@ export default function LoginPage() {
         }
 
         setUser({
+            id: data?.user.id,
             username: username,
             password: password
         })
