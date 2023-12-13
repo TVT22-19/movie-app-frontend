@@ -1,6 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {GroupData, GroupUser, Member, Post, UserRemovalBody} from "./types"
-import {fetchGroupInfo, fetchMembers, fetchDiscussionPosts, createDiscussionPost, removeMember, checkMembership, checkOwnership, fetchGroupsByUser} from "./groupAPI"
+import {GroupData, GroupUser, JoinRequestBody, Member, Post, UserRemovalBody} from "./types"
+import {fetchGroupInfo, fetchMembers, fetchDiscussionPosts, createDiscussionPost, removeMember, checkMembership, checkOwnership, fetchGroupsByUser, createJoinRequest} from "./groupAPI"
 
 export const useFetchMembers = (groupId: number) => useQuery<Member[], Error>({
     queryKey: ["fetchmembers", groupId],
@@ -33,6 +33,13 @@ export const useRemoveMember = () => {
         onSettled: () => {
             return queryClient.invalidateQueries({queryKey: [`fetchmembers`]})
         }
+    })
+}
+
+export const useCreateJoinRequest = () => {
+    return useMutation< string, Error, JoinRequestBody>({
+        mutationKey: ['addjoinrequest'],
+        mutationFn: (joinRequestBody: JoinRequestBody) => createJoinRequest(joinRequestBody).then(data => data),
     })
 }
 

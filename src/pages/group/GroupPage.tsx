@@ -20,11 +20,14 @@ import { Navigate, useParams } from "react-router-dom";
 import PostCreationDialog from "./dialog/PostCreationDialog.tsx";
 import RemoveMemberDialog from "./dialog/RemoveMemberDialog.tsx";
 
-import { useCheckMembership, useCheckOwnership, useFetchDiscussionPosts, useFetchGroupInfo, useFetchMembers } from "./groupqueries.ts";
+import { useCheckMembership, useCheckOwnership, useFetchDiscussionPosts, useFetchGroupInfo, useFetchMembers, useCreateJoinRequest } from "./groupqueries.ts";
 import { createDiscussionPost } from "./groupAPI.ts";
 import { User } from "../../services/types.ts";
+import { JoinRequestBody } from "./types.ts";
 
 export default function GroupPage() {
+
+    const createJoinRequestMutation = useCreateJoinRequest();
 
     const { isAuthorized, getToken } = useAuth();
     let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
@@ -32,6 +35,7 @@ export default function GroupPage() {
     const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
     const [openRemoveMemberDialog, setOpenRemoveMemberDialog] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+    const [requestSent, setRequestSent] = useState(false);
 
     const userId = user?.userId;
 
@@ -47,6 +51,10 @@ export default function GroupPage() {
 
     const handleRemoveCancel = () => {
         setOpenRemoveMemberDialog(false);
+    };
+
+    const handleRequestSent = () => {
+        setRequestSent(true);
     };
 
     const handleCreatePost = async (title: string, content: string) => {
@@ -144,7 +152,7 @@ export default function GroupPage() {
 
 
                 {isMember ? (
-                    
+
                     <div>
                         <Typography variant="h5">Group News</Typography>
 
@@ -171,7 +179,26 @@ export default function GroupPage() {
                         <Button onClick={() => setOpenCreatePostDialog(true)}> Create news post </Button>
 
                     </div>) : (
-                    <Button> Request to join this group </Button>
+                        <div>
+
+                        {!requestSent ? (
+                        <Button variant="contained" onClick={() => {
+                        createJoinRequestMutation.mutate({
+                            userId: userId,
+                            groupId: groupId,
+                        } as JoinRequestBody, {
+                            onSuccess: () => console.log("Request sent", userId, groupId),
+                            onSettled: () => handleRequestSent()
+                        })
+                    }}
+                    >Request to join this group </Button>
+
+
+                        ): (
+                            <Typography> Request sent </Typography>
+                        )}
+                    
+                    </div>
                 )}
             </Stack>
         </div>

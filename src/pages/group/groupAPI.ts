@@ -1,5 +1,5 @@
 
-import { GroupData, GroupUser, Member, Post, UserRemovalBody } from "./types.ts";
+import { GroupData, GroupUser, JoinRequestBody, Member, Post, UserRemovalBody } from "./types.ts";
 
 const hostUrl: string = "http://localhost:3001"
 
@@ -101,4 +101,27 @@ export const fetchGroupsByUser = async (userId: number):Promise <GroupUser[]> =>
       throw new Error(`Error fetching groups`);
     }
   };
+
+  export const createJoinRequest = async ( joinRequestBody: JoinRequestBody): Promise <string> => {
+
+    console.log (joinRequestBody);
+   
+        const response = await fetch(`${hostUrl}/grouprequest/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({userid: joinRequestBody.userId, groupid: joinRequestBody.groupId})
+        });
+        
+
+        if (!response.ok) {
+            throw new Error((await response.json()).message);
+        }
+
+        return await response.json() as string;
+    
+}
   
+
+

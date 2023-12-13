@@ -35,3 +35,9 @@ export interface UserRemovalBody {
     groupId: number,
 
 }
+
+export interface JoinRequestBody {
+    userId: number,
+    groupId: number,
+
+}
