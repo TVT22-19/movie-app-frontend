@@ -1,36 +1,32 @@
-import {useQuery} from "@tanstack/react-query";
-import {Group} from "./types.ts";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {ApiMessage, Group, GroupCreationBody, JoinRequests} from "./types.ts";
+import {answerToJoinRequest, createGroup, getGroupInvites, getGroups} from "./movieApi.ts";
 
-export const useGroups = (isAuthorized: boolean) => useQuery<Group[], Error>({
-    queryKey: [`groups`],
-    queryFn: () => ([
-        {
-            id: 1,
-            name: "My new group"
-        },
-        {
-            id: 2,
-            name: "My internal ford"
-        },
-        {
-            id: 3,
-            name: "D.D.D"
-        }
-    ] as Group[]),
-    enabled: isAuthorized
+export const useGroups = () => useQuery<Group[], Error>({
+    queryKey: ["groups"],
+    queryFn: () => getGroups().then(data => data)
 })
 
-export const useGroupInvites = (isAuthorized: boolean) => useQuery<Group[], Error>({
+export const useGroupInvites = (userId: number, isAuthorized: boolean) => useQuery<JoinRequests[], Error>({
     queryKey: [`group_invites`],
-    queryFn: () => ([
-        {
-            id: 4,
-            name: "T.T.T"
-        },
-        {
-            id: 5,
-            name: "Mastermind"
-        }
-    ] as Group[]),
+    queryFn: () => getGroupInvites(userId).then(data => data),
     enabled: isAuthorized
 })
+
+export const useGroupCreate = () => {
+    const queryClient = useQueryClient()
+    return useMutation<ApiMessage, Error, GroupCreationBody>({
+        mutationKey: ["createGroup"],
+        mutationFn: (groupBody) => createGroup(groupBody).then(data => data),
+        onSettled: () => queryClient.invalidateQueries({queryKey: ["groups"]})
+    });
+}
+
+export const useAnswerToJoinRequest = () => {
+    const queryClient = useQueryClient()
+    return useMutation<void, Error, { userId: number, groupId: number, choice: boolean }>({
+        mutationKey: ["createGroup"],
+        mutationFn: (group) => answerToJoinRequest(group.userId, group.groupId, group.choice).then(data => data),
+        onSettled: () => queryClient.invalidateQueries({queryKey: ["group_invites", "fetchgroupsbyuser"]})
+    });
+}

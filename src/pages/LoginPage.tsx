@@ -16,8 +16,8 @@ export default function LoginPage() {
 
     const navigate = useNavigate()
 
-    const {isAuthorized, setToken} = useAuth()
-    if (isAuthorized) navigate("/profile")
+    const {isAuthorized, setToken, getToken} = useAuth()
+    if (isAuthorized) navigate(`/profile/${JSON.parse(atob(getToken()!.split(".")[1])).userId}}`)
 
     const {data, status, error} = useLogin(user)
 

@@ -15,11 +15,6 @@ export interface GroupUser {
     name: string;
 
 }
-export interface FetchGroupsResult {
-    data?: GroupUser[];
-    error?: Error;
-    isLoading: boolean;
-}
 
 export interface Post {
     user_id: number;
