@@ -24,12 +24,10 @@ import { useAuth } from "../hooks/useAuth.tsx";
 import SendIcon from '@mui/icons-material/Send';
 import { useFetchMovieData, useFetchReviewsByMovieId, addReview } from "./movieAndSearchQueries.ts";
 import MovieRating from "./MovieRating.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Review } from "./types.ts";
 import { User } from "../services/types.ts";
 
-//TODO: re-fetch reviews to display the one just added
-//TODO: sort the reviews chronologically upon fetch (currently sorting doesn't happen automatically - only when radio buttons change)
 
 export default function MoviePage() {
     const [reviewContent, setReviewContent] = useState('');
@@ -44,15 +42,9 @@ export default function MoviePage() {
     if (Number.isNaN(movieId)) return <Navigate to="/page-not-found" />
 
     const { data: movieInfo, error: infoError, isLoading: infoLoading } = useFetchMovieData(movieId);
-    const { data: reviewData, error: reviewError, isLoading: reviewLoading } = useFetchReviewsByMovieId(movieId);
+    const { data: reviewData, error: reviewError, isLoading: reviewLoading, refetch: refetchReviews } = useFetchReviewsByMovieId(movieId);
 
-    if (infoLoading || reviewLoading) {
-        return <div>Loading...</div>;
-    }
-
-    if (infoError) {
-        return <div>Error loading movie data</div>;
-    }
+  
 
     const handleAddReview = async () => {
 
@@ -61,11 +53,11 @@ export default function MoviePage() {
             console.log('Content:', reviewContent);
             console.log('Rating:', reviewRating);
             if (user?.userId !== undefined) {
-            addReview(user.userId, movieId, reviewContent, ratingToSend);
-            setReviewContent('');
-            setReviewRating(0);
-            //refetch
-            }else{
+                await addReview(user.userId, movieId, reviewContent, ratingToSend);
+                setReviewContent('');
+                setReviewRating(0);
+                refetchReviews();
+            } else {
                 console.log("User ID undefined")
             }
 
@@ -74,6 +66,8 @@ export default function MoviePage() {
         }
 
     };
+
+
 
     const handleSortChange = (newSortOption: 'chronological' | 'rating') => {
 
@@ -97,13 +91,28 @@ export default function MoviePage() {
             }
         }
     };
+    useEffect(() => {
 
+        handleSortChange('chronological');
+    }, [reviewData]);
+
+    useEffect(() => {//otherwise the old choice stays displayed upon reloading the page
+        setSortOption('chronological'); 
+    }, []);
 
     const theme = useTheme();
 
+    if (infoLoading || reviewLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (infoError) {
+        return <div>Error loading movie data</div>;
+    }
+
     return (
         <Stack spacing={2}>
-            {movieInfo && movieInfo.title ? (
+            {movieInfo && movieInfo.title !== undefined ? (
                 <Card>
                     <Stack direction="row">
 
@@ -167,30 +176,30 @@ export default function MoviePage() {
                     <Box mt={2} />
                     <div>
 
-                    {reviewData && reviewData.length > 0 ? (
-                         <Card style={{padding:'16px'}}>
-                        <FormControl component="fieldset">
-                            <FormLabel component="legend">Sort Order</FormLabel>
-                            <RadioGroup
-                                row
-                                aria-label="sort-order"
-                                name="sort-order"
-                                value={sortOption}
-                                onChange={(e) => {
-                                    const chosenValue = e.target.value as 'chronological' | 'rating';
-                                    setSortOption(chosenValue);
-                                    handleSortChange(chosenValue);
-                                }}
-                            >
-                                <FormControlLabel value="chronological" control={<Radio />} label="Chronological" />
-                                <FormControlLabel value="rating" control={<Radio />} label="By Rating" />
-                            </RadioGroup>
-                        </FormControl>
-                    </Card>
+                        {reviewData && reviewData.length > 0 ? (
+                            <Card style={{ padding: '16px' }}>
+                                <FormControl component="fieldset">
+                                    <FormLabel component="legend">Sort Order</FormLabel>
+                                    <RadioGroup
+                                        row
+                                        aria-label="sort-order"
+                                        name="sort-order"
+                                        value={sortOption}
+                                        onChange={(e) => {
+                                            const chosenValue = e.target.value as 'chronological' | 'rating';
+                                            setSortOption(chosenValue);
+                                            handleSortChange(chosenValue);
+                                        }}
+                                    >
+                                        <FormControlLabel value="chronological" control={<Radio />} label="Chronological" />
+                                        <FormControlLabel value="rating" control={<Radio />} label="By Rating" />
+                                    </RadioGroup>
+                                </FormControl>
+                            </Card>
 
-                    ) : (
-                        <Typography style={{padding:'16px'}}>No reviews</Typography>
-                    )}
+                        ) : (
+                            <Typography style={{ padding: '16px' }}>No reviews</Typography>
+                        )}
                     </div>
 
                     {!reviewError ? (
@@ -200,13 +209,13 @@ export default function MoviePage() {
                                     <Stack direction="row">
                                         <Typography flexGrow={1} variant="h6">
                                             Review by {review.username}
-                                        </Typography> 
+                                        </Typography>
                                         {review.rating !== null && <Rating readOnly value={review.rating} />}
                                     </Stack>
                                     <Typography variant="body2">{review.content}</Typography>
                                     <Typography style={{ color: theme.palette.text.secondary }}>
-                                            <small>Review submitted on: {new Date(review.timestamp).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} </small>
-                                        </Typography>
+                                        <small>Review submitted on: {new Date(review.timestamp).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })} </small>
+                                    </Typography>
                                 </CardContent>
                             </Card>
                         ))
