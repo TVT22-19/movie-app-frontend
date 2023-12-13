@@ -64,3 +64,13 @@ export const updateUser = async (user: User): Promise<AuthObject> => {
 
     return await response.json() as AuthObject
 }
+
+export const deleteUser = async (id: number): Promise<string> => {
+    const response = await fetch(`${hostUrl}/users/delete/${id}`, {
+        method: "DELETE"
+    })
+
+    if (response.status !== 200) throw new Error((await response.json()).message)
+
+    return await response.json() as string
+}

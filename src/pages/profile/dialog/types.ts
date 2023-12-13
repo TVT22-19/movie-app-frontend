@@ -6,3 +6,9 @@ export interface ProfileEditDialogProps {
     setOpen: Dispatch<boolean>,
     user: User
 }
+
+export interface ProfileDeleteDialogProps {
+    open: boolean,
+    setOpen: Dispatch<boolean>,
+    user: User
+}
