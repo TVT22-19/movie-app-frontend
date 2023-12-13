@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-const hostUrl: string = "http://localhost:3001";
 import { Movie, TVSeries, Review } from "./types";
+
+const hostUrl: string = "http://localhost:3001";
 
 export const fetchMedia = async (query: string, isMovie: boolean) => {
     if (!query) {
@@ -18,9 +19,11 @@ export const fetchMedia = async (query: string, isMovie: boolean) => {
 
 const fetchMovieData = async (id: number): Promise <Movie> => {
     const response = await fetch(`${hostUrl}/moviedb/${id}`);
+
     if (!response.ok) {
         throw new Error('Failed to fetch movie data');
     }
+
     return response.json();
 };
 
@@ -36,11 +39,43 @@ const fetchReviewsByMovieId = async (id: number): Promise <Review[]> => {
     if (!response.ok) {
         throw new Error('Failed to fetch movie data');
     }
-    return response.json();
+    const reviews = await response.json();
+
+    const userIds = reviews.map((review: Review)=> review.user_id);
+
+    // user information for each user ID
+    const users = await Promise.all(
+        userIds.map((userId: number) => fetch(`${hostUrl}/users/${userId}`).then(response => response.json()))
+    );
+
+    const reviewsWithUsernames = reviews.map((review: Review, index: number) => ({
+        ...review,
+        username: users[index].username, 
+    }));
+
+    return reviewsWithUsernames;
 };
+
 
 export const useFetchReviewsByMovieId = (movieId: number) => useQuery< Review[], Error>({
     queryKey: ["fetchreviewsbymovieid", movieId],
     queryFn: () => fetchReviewsByMovieId(movieId),
 
 })
+
+
+export const addReview = async (userID: number, movieID:number, content: string, rating: number) => {
+    const response = await fetch(`${hostUrl}/review`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userID, movieID, content, rating}),
+    });
+  
+    if (!response.ok) {
+        throw new Error('Failed to add review');
+    }
+  
+    return response.json();
+  };

@@ -4,19 +4,16 @@ import {Link} from "react-router-dom";
 export default function HomePage() {
     return (
         <Stack spacing={2}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(value =>
-                <Card>
-                    <CardActionArea component={Link} to={`movie/${value}`}>
-                        <CardContent>
-                            <Typography variant="h4">{value}. Spider-man Across The JavaScript</Typography>
-                            <Typography variant="body1">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-                                blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur, neque
-                                doloribus,
-                                cupiditate numquam dignissimos laborum fugiat deleniti? Eum quasi quidem
-                                quibusdam.</Typography>
-                        </CardContent>
-                    </CardActionArea>
-                </Card>)}
+            <Card sx={{ padding: 3 }}> 
+                <Typography>
+                    <h2> Welcome to Movie App! </h2>
+                    
+Movie App provides a simple and user-friendly space for movie enthusiasts. On the platform, you can search for movies, share and read reviews, create groups, and connect with friends. You can also personalize your profile to make your movie-watching experience unique. Movie App is a space for film lovers to explore, discuss, and enjoy the world of cinema.
+
+
+                </Typography>
+            </Card>
+           
         </Stack>
     )
 }

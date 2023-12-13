@@ -1,6 +1,6 @@
-import {useQuery} from "@tanstack/react-query";
-import {GroupData, Member, Post} from "./types"
-import {fetchGroupInfo, fetchMembers, fetchDiscussionPosts, createDiscussionPost, removeMember, checkMembership, checkOwnership} from "./groupAPI"
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {GroupData, GroupUser, JoinRequestBody, Member, Post, UserRemovalBody} from "./types"
+import {fetchGroupInfo, fetchMembers, fetchDiscussionPosts, createDiscussionPost, removeMember, checkMembership, checkOwnership, fetchGroupsByUser, createJoinRequest} from "./groupAPI"
 
 export const useFetchMembers = (groupId: number) => useQuery<Member[], Error>({
     queryKey: ["fetchmembers", groupId],
@@ -24,15 +24,24 @@ export const useCreatePost = (title: string, content: string, groupID: number, u
  queryKey: ["createpost", title, content, groupID, userID],
  queryFn: () => createDiscussionPost(title, content, groupID, userID),  }) 
 
-//useMutation
-/*
-export const useRemoveMember = (selectedUserId: number, groupId: number) => useQuery< void , Error>({
-queryKey: ["removemember", selectedUserId, groupId],
-queryFn: () => removeMember(selectedUserId, groupId),
 
-})
-*/
+export const useRemoveMember = () => {
+ const queryClient = useQueryClient()
+    return useMutation< string, Error, UserRemovalBody>({
+        mutationKey: ['removemember'],
+        mutationFn: (userRemovalBody: UserRemovalBody) => removeMember(userRemovalBody).then(data => data),
+        onSettled: () => {
+            return queryClient.invalidateQueries({queryKey: [`fetchmembers`]})
+        }
+    })
+}
 
+export const useCreateJoinRequest = () => {
+    return useMutation< string, Error, JoinRequestBody>({
+        mutationKey: ['addjoinrequest'],
+        mutationFn: (joinRequestBody: JoinRequestBody) => createJoinRequest(joinRequestBody).then(data => data),
+    })
+}
 
 export const useCheckMembership = (userId: number, groupId: number) => useQuery< void, Error>({
     queryKey: ["checkmembership", userId, groupId],
@@ -44,4 +53,10 @@ export const useCheckOwnership = (userId: number, groupId: number) => useQuery< 
     queryFn: () => checkOwnership(userId, groupId),
     
 })
+export const useFetchGroupsByUser = (userId: number) => useQuery< GroupUser[] , Error>({
+    queryKey: ["fetchgroupsbyuser", userId],
+    queryFn: () => fetchGroupsByUser(userId),
+    
+})
+
 
