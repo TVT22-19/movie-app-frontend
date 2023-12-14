@@ -1,7 +1,7 @@
 import TextField from "@mui/material/TextField";
 import {Button, Card, Container, Divider, Stack, Typography} from "@mui/material";
 import {useState} from "react";
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
 import {User} from "../services/types";
 import {useAuth} from "../hooks/useAuth.tsx";
 import {useLogin} from "../services/auth.ts";
@@ -14,12 +14,12 @@ export default function LoginPage() {
     const [password, setPassword] = useState<string>("")
     const [user, setUser] = useState<User>()
 
-    const navigate = useNavigate()
-
     const {isAuthorized, setToken, getToken} = useAuth()
-    if (isAuthorized) navigate(`/profile/${JSON.parse(atob(getToken()!.split(".")[1])).userId}}`)
+    let _user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
     const {data, status, error} = useLogin(user)
+
+    if (isAuthorized) return <Navigate to={`/profile/${_user?.userId}}`}/>
 
     if (status === "pending" && user) return (<Loader/>)
 
@@ -32,7 +32,6 @@ export default function LoginPage() {
         if (data.token != null) setToken(data.token)
         setUser(undefined)
         console.log(`Welcome back ${user.username}`, {variant: "info"})
-        navigate(`/profile/${data.user.id}`, {state: {id: data.user.id, username: username}})
     }
 
     function loginUser(username: string, password: string) {

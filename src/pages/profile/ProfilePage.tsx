@@ -7,6 +7,7 @@ import ProfileDeleteDialog from "./dialog/ProfileDeleteDialog.tsx";
 import {useUser} from "../../services/users.ts"
 import {useReviews} from "../../services/reviews.ts"
 import {useAuth} from "../../hooks/useAuth.tsx";
+import {User} from "../../services/types.ts";
 
 export default function ProfilePage() {
 
@@ -17,8 +18,9 @@ export default function ProfilePage() {
 
     const profileId = Number(useParams().id)
     if (Number.isNaN(profileId)) return <Navigate to="/page-not-found"/>
+    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
-    const isProfileOwner = JSON.parse(atob(getToken()!.split(".")[1])).userId === profileId
+    const isProfileOwner = (user?.userId === profileId) || false
 
     const {data: userData, status: userStatus, error: userError} = useUser(profileId)
     const {data: reviewData, status: reviewStatus, error: reviewError} = useReviews(profileId)

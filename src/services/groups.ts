@@ -7,10 +7,10 @@ export const useGroups = () => useQuery<Group[], Error>({
     queryFn: () => getGroups().then(data => data)
 })
 
-export const useGroupInvites = (userId: number, isAuthorized: boolean) => useQuery<JoinRequests[], Error>({
+export const useGroupInvites = (userId: number | undefined, isAuthorized: boolean) => useQuery<JoinRequests[], Error>({
     queryKey: [`group_invites`],
-    queryFn: () => getGroupInvites(userId).then(data => data),
-    enabled: isAuthorized
+    queryFn: () => getGroupInvites(userId!).then(data => data),
+    enabled: (isAuthorized && !!userId)
 })
 
 export const useGroupCreate = () => {

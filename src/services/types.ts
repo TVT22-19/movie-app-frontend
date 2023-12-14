@@ -47,5 +47,9 @@ export interface Reviews {
 
 export interface JoinRequests {
     group_id: number,
-    requests: { user_id: number }[]
+    group_name: string
+    requests: {
+        user_id: number
+        username: string
+    }[]
 }

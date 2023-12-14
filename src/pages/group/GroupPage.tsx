@@ -27,7 +27,7 @@ export default function GroupPage() {
     const createJoinRequestMutation = useCreateJoinRequest();
 
     const {getToken} = useAuth();
-    const user: User | undefined = JSON.parse(atob(getToken()!.split('.')[1]))
+    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
     const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
     const [openRemoveMemberDialog, setOpenRemoveMemberDialog] = useState(false);

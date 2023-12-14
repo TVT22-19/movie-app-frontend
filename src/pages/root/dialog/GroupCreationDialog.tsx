@@ -6,7 +6,6 @@ import {useGroupCreate} from "../../../services/groups.ts";
 import {GroupCreationBody, User} from "../../../services/types.ts";
 import {useAuth} from "../../../hooks/useAuth.tsx";
 
-
 export default function GroupCreationDialog(props: CreateGroupDialogProps) {
 
     const [groupName, setGroupName] = useState<string>("")
@@ -15,6 +14,7 @@ export default function GroupCreationDialog(props: CreateGroupDialogProps) {
 
     const createGroupMutation = useGroupCreate()
     const {getToken} = useAuth()
+    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
     function createGroup(groupname: string, groupdesc: string, groupavatar: string) {
 
@@ -32,7 +32,7 @@ export default function GroupCreationDialog(props: CreateGroupDialogProps) {
             gname: groupname,
             gdesc: groupdesc,
             gavatar: groupavatar,
-            owner: (JSON.parse(atob(getToken()!.split('.')[1])) as User).userId
+            owner: user?.userId
         } as GroupCreationBody, {
             onSuccess: () => props.setOpen(false)
         })

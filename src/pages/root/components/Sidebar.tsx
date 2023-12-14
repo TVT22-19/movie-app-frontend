@@ -20,7 +20,7 @@ export default function Sidebar() {
     const drawerWidth = 240;
 
     const {isAuthorized, getToken} = useAuth();
-    const user: User | undefined = JSON.parse(atob(getToken()!.split('.')[1]))
+    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined
     const userId = user?.userId;
 
     const {data: groupsData} = useFetchGroupsByUser(userId);

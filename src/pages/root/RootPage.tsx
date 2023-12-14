@@ -35,6 +35,7 @@ import {StyledField} from "./components/StyledField.tsx";
 import Sidebar from "./components/Sidebar.tsx";
 import GroupCreationDialog from "./dialog/GroupCreationDialog.tsx";
 import {useAnswerToJoinRequest, useGroupInvites} from "../../services/groups.ts";
+import {User} from "../../services/types.ts";
 
 export default function RootPage() {
 
@@ -52,9 +53,9 @@ export default function RootPage() {
 
     const [buttonsDisabled, setButtonsDisabled] = useState(false)
 
-    const user = JSON.parse(atob(getToken()!.split(".")[1]))
+    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
-    const {data} = useGroupInvites(user.userId, isAuthorized)
+    const {data} = useGroupInvites(user?.userId, isAuthorized)
     const answerToJoinRequestMutation = useAnswerToJoinRequest()
 
     return (
@@ -98,13 +99,13 @@ export default function RootPage() {
                                     }}
                                 >
                                     <Stack spacing={1}>
-                                        {data ? data.map((group) =>
+                                        {(data && Array.isArray(data)) ? data.map((group) =>
                                             group.requests.map((user) => (
                                                 <Card>
                                                     <CardContent>
                                                         <Typography variant="h6">Join Request</Typography>
-                                                        <Typography variant="body1">Group: {group.group_id}</Typography>
-                                                        <Typography variant="body1">User: {user.user_id}</Typography>
+                                                        <Typography variant="body1">Group: {group.group_name}</Typography>
+                                                        <Typography variant="body1">User: {user.username}</Typography>
                                                     </CardContent>
                                                     <CardActions disableSpacing
                                                                  style={{justifyContent: "space-evenly"}}>
@@ -153,7 +154,7 @@ export default function RootPage() {
                                 >
                                     <MenuItem onClick={() => {
                                         setProfileAnchorEl(null)
-                                        navigate(`profile/${user.userId}`);
+                                        navigate(`profile/${user?.userId}`);
                                     }}>
                                         <ListItemIcon>
                                             <People fontSize="small"/>
