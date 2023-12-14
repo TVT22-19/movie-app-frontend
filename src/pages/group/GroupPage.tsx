@@ -134,7 +134,7 @@ export default function GroupPage() {
                                         <Stack spacing={2} direction="row" style={{ alignItems: "center" }}>
                                             <Avatar src={member.avatar} alt={member.username} />
                                             <Typography>{member.username}</Typography>
-                                            {isOwner ? (<IconButton color="error" onClick={() => handleRemoveClick(member.id)}>
+                                            {isOwner && (userId!==member.id) ? (<IconButton color="error" onClick={() => handleRemoveClick(member.id)}>
                                                 <CancelIcon />
                                             </IconButton>
                                             ) : (
