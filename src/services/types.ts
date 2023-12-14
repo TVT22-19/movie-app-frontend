@@ -42,7 +42,8 @@ export interface Reviews {
     user_id: number,
     movie_id: number,
     content: string,
-    rating: string
+    rating: number,
+    movie_name: string
 }
 
 export interface JoinRequests {

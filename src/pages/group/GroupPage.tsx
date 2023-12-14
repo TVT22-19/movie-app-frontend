@@ -135,16 +135,17 @@ export default function GroupPage() {
                     <Grid container>
                         {membersData.map((member) => (
                             <Grid key={member.id} paddingRight={2} paddingBottom={2}>
-                                <Card>
+                                <Card  style={{ minHeight: '100%' }}>
                                     <CardContent>
                                         <Stack spacing={2} direction="row" style={{alignItems: "center"}}>
                                             <Avatar src={member.avatar} alt={member.username}/>
                                             <Typography>{member.username}</Typography>
-                                            {isOwner ? (
-                                                <IconButton color="error" onClick={() => handleRemoveClick(member.id)}>
-                                                    <CancelIcon/>
-                                                </IconButton>
-                                            ) : <Box></Box>}
+                                            {isOwner && (userId!==member.id) ? (<IconButton color="error" onClick={() => handleRemoveClick(member.id)}>
+                                                <CancelIcon />
+                                            </IconButton>
+                                            ) : (
+                                                <Box></Box>
+                                            )}
                                         </Stack>
                                     </CardContent>
                                 </Card>
