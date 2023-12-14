@@ -1,4 +1,4 @@
-import {Alert, Avatar, Card, CardContent, Divider, IconButton, Link, Stack, Typography} from "@mui/material";
+import {Alert, Avatar, Card, CardContent, Divider, IconButton, Link, Rating, Stack, Typography} from "@mui/material";
 import {Navigate, useNavigate, useParams} from "react-router-dom";
 import {Delete, Edit,} from "@mui/icons-material";
 import {useState} from "react";
@@ -87,18 +87,20 @@ export default function ProfilePage() {
                 {reviewData?.length! > 0 ? reviewData?.map((data) =>
                     <Card>
                         <CardContent>
-                            <Stack spacing={2} direction="row" alignSelf="start">
-                                {data.content}
-                            </Stack>
-                            <Stack alignSelf="end">
-                                {data.rating}
-                            </Stack>
-                            
-                                <Link component="button" 
-                                    onClick={() => handleMovieClick(data.movie_id) /*TEMP*/}
+                             <Link component="button" 
+                                onClick={() => handleMovieClick(data.movie_id) /*TEMP*/}
                                 underline="always"> 
                                  {data.movie_id}
                                 </Link>
+                            
+                            <Stack alignSelf="end">
+                            {data.rating !== null && <Rating readOnly value={data.rating} />}
+                                
+                            </Stack>
+                            <Stack spacing={2} direction="row" alignSelf="start">
+                                {data.content}
+                            </Stack>
+                               
                             
                         </CardContent>
                     </Card>
