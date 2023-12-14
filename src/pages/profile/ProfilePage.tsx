@@ -88,9 +88,9 @@ export default function ProfilePage() {
                     <Card>
                         <CardContent>
                              <Link component="button" 
-                                onClick={() => handleMovieClick(data.movie_id) /*TEMP*/}
+                                onClick={() => handleMovieClick(data.movie_id)}
                                 underline="always"> 
-                                 {data.movie_id}
+                                 {data.movie_name}
                                 </Link>
                             
                             <Stack alignSelf="end">
