@@ -1,7 +1,7 @@
 import TextField from "@mui/material/TextField";
 import {Button, Card, Container, Divider, Stack, Typography} from "@mui/material";
 import {useState} from "react";
-import {Link, Navigate, useLocation, useNavigate} from "react-router-dom";
+import {Link, Navigate, useLocation} from "react-router-dom";
 import {User} from "../services/types";
 import {useAuth} from "../hooks/useAuth.tsx";
 import {useLogin} from "../services/auth.ts";
@@ -19,7 +19,7 @@ export default function LoginPage() {
 
     const {data, status, error} = useLogin(user)
 
-    if (isAuthorized) return <Navigate to={`/profile/${_user?.userId}}`}/>
+    if (isAuthorized) return <Navigate to={`/profile/${_user?.userId}`}/>
 
     if (status === "pending" && user) return (<Loader/>)
 
