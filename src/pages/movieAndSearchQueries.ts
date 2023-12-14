@@ -70,7 +70,7 @@ export const addReview = async (userID: number, movieID:number, content: string,
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userID, movieID, content, rating}),
+      body: JSON.stringify({ user_id: userID, movie_id: movieID, content: content, rating: rating}),
     });
   
     if (!response.ok) {
