@@ -1,5 +1,5 @@
-import {Alert, Avatar, Card, CardContent, Divider, IconButton, Stack, Typography} from "@mui/material";
-import {Navigate, useParams} from "react-router-dom";
+import {Alert, Avatar, Card, CardContent, Divider, IconButton, Link, Stack, Typography} from "@mui/material";
+import {Navigate, useNavigate, useParams} from "react-router-dom";
 import {Delete, Edit,} from "@mui/icons-material";
 import {useState} from "react";
 import ProfileEditDialog from "./dialog/ProfileEditDialog.tsx";
@@ -15,6 +15,7 @@ export default function ProfilePage() {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const {getToken} = useAuth()
+    const navigate = useNavigate()
 
     const profileId = Number(useParams().id)
     if (Number.isNaN(profileId)) return <Navigate to="/page-not-found"/>
@@ -44,6 +45,10 @@ export default function ProfilePage() {
 
     if(reviewStatus === "success"){
         console.log("Reviews retrieved successfully")
+    }
+
+      const handleMovieClick = (movieId: number) =>  {
+        navigate(`/movie/${movieId}`);
     }
     
     return (
@@ -88,6 +93,13 @@ export default function ProfilePage() {
                             <Stack alignSelf="end">
                                 {data.rating}
                             </Stack>
+                            
+                                <Link component="button" 
+                                    onClick={() => handleMovieClick(data.movie_id) /*TEMP*/}
+                                underline="always"> 
+                                 {data.movie_id}
+                                </Link>
+                            
                         </CardContent>
                     </Card>
                 ) : <Card>
