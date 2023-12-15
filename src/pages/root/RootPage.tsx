@@ -1,6 +1,7 @@
 import {Link, Outlet, useNavigate} from "react-router-dom";
 import {
     AppBar,
+    Badge,
     Box,
     Button,
     Card,
@@ -75,7 +76,9 @@ export default function RootPage() {
                         {isAuthorized ? <>
                                 <IconButton size="large" color="inherit"
                                             onClick={(event) => setNotifyAnchorEl(event.currentTarget)}>
-                                    <Notifications/>
+                                    <Badge badgeContent={data?.length} color="primary">
+                                        <Notifications/>
+                                    </Badge>
                                 </IconButton>
                                 <Menu
                                     id="menu-appbar"
@@ -96,7 +99,7 @@ export default function RootPage() {
                                     }}
                                 >
                                     <Stack spacing={1}>
-                                        {(data && Array.isArray(data)) ? data.map((group) =>
+                                        {(data && data.length > 0) ? data.map((group) =>
                                             group.requests.map((user) => (
                                                 <Card>
                                                     <CardContent>
@@ -108,8 +111,9 @@ export default function RootPage() {
                                                                  style={{justifyContent: "space-evenly"}}>
                                                         <IconButton disabled={buttonsDisabled} onClick={() => {
                                                             setButtonsDisabled(true)
+                                                            console.log(Object.entries(group))
                                                             answerToJoinRequestMutation.mutate({
-                                                                userId: user.user_id,
+                                                                userId: user.id,
                                                                 groupId: group.group_id,
                                                                 choice: true
                                                             }, {
@@ -121,7 +125,7 @@ export default function RootPage() {
                                                         <IconButton disabled={buttonsDisabled} onClick={() => {
                                                             setButtonsDisabled(true)
                                                             answerToJoinRequestMutation.mutate({
-                                                                userId: user.user_id,
+                                                                userId: user.id,
                                                                 groupId: group.group_id,
                                                                 choice: false
                                                             }, {

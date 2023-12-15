@@ -29,16 +29,17 @@ export default function ProfileEditDialog(props: ProfileEditDialogProps) {
         console.log("Updated successfully!")
     }
 
-    function updateUser(username: string, password: string, age: number, firstname: string, lastname: string, avatarURL: string) {
+    function updateUser(newUsername: string, newPassword: string, newAge: number,
+                        newFirstname: string, newLastname: string, newAvatarURL: string) {
         setUser({
             id: props.user.id,
-            username: username,
-            password: password,
+            username: newUsername || props.user.username,
+            password: newPassword || props.user.username,
             registration_date: props.user.registration_date,
-            age: age,
-            firstname: firstname,
-            lastname: lastname,
-            avatarURL: avatarURL
+            age: newAge || props.user.age,
+            firstname: newFirstname || props.user.firstname,
+            lastname: newLastname || props.user.lastname,
+            avatarURL: newAvatarURL || props.user.avatarURL
         })
 
         props.setOpen(false)

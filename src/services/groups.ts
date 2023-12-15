@@ -43,7 +43,10 @@ export const useGroupCreate = () => {
     return useMutation<ApiMessage, Error, GroupCreationBody>({
         mutationKey: ["createGroup"],
         mutationFn: (groupBody) => createGroup(groupBody).then(data => data),
-        onSettled: () => queryClient.invalidateQueries({queryKey: ["groups"]})
+        onSettled: () => {
+            queryClient.invalidateQueries({queryKey: ["fetchgroupsbyuser"]})
+            return queryClient.invalidateQueries({queryKey: ["groups"]});
+        }
     });
 }
 
@@ -52,7 +55,7 @@ export const useAnswerToJoinRequest = () => {
     return useMutation<void, Error, { userId: number, groupId: number, choice: boolean }>({
         mutationKey: ["createGroup"],
         mutationFn: (group) => answerToJoinRequest(group.userId, group.groupId, group.choice).then(data => data),
-        onSettled: () => queryClient.invalidateQueries({queryKey: ["group_invites", "fetchgroupsbyuser"]})
+        onSettled: () => queryClient.invalidateQueries({queryKey: ["group_invites"]})
     });
 }
 
