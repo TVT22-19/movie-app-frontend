@@ -1,7 +1,7 @@
 import {ApiError, ApiMessage, AuthObject, Group, GroupCreationBody, JoinRequests, Reviews, User} from "./types.ts";
 
 // TODO Add url address for remove server
-const hostUrl: string = "https://movie-app-backend-wjza.onrender.com/"
+const hostUrl: string = "https://movie-app-backend-wjza.onrender.com"
 
 // Example request
 export const getUser = async (id: number): Promise<User> => {
