@@ -22,7 +22,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 //TODO: hide "clear rating" if rating is set to 0, make the clear rating and clear year buttons prettier
 
-const hostUrl: string = "http://localhost:3001"
+const hostUrl: string = "https://movie-app-backend-wjza.onrender.com"
 
 
 const SearchPage: React.FC = () => {
