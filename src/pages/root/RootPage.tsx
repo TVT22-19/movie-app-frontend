@@ -1,6 +1,7 @@
 import {Link, Outlet, useNavigate} from "react-router-dom";
 import {
     AppBar,
+    Badge,
     Box,
     Button,
     Card,
@@ -53,7 +54,7 @@ export default function RootPage() {
 
     const [buttonsDisabled, setButtonsDisabled] = useState(false)
 
-    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
+    const user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
     const {data} = useGroupInvites(user?.userId, isAuthorized)
     const answerToJoinRequestMutation = useAnswerToJoinRequest()
@@ -78,7 +79,9 @@ export default function RootPage() {
                                 <IconButton size="large" color="inherit" onClick={(event) => {
                                     setNotifyAnchorEl(event.currentTarget)
                                 }}>
-                                    <Notifications/>
+                                    <Badge badgeContent={data?.length} color="primary">
+                                        <Notifications/>
+                                    </Badge>
                                 </IconButton>
                                 <Menu
                                     id="menu-appbar"
@@ -99,7 +102,7 @@ export default function RootPage() {
                                     }}
                                 >
                                     <Stack spacing={1}>
-                                        {(data && Array.isArray(data)) ? data.map((group) =>
+                                        {((data && data.length > 0) ? data.map((group) =>
                                             group.requests.map((user) => (
                                                 <Card>
                                                     <CardContent>
@@ -111,8 +114,9 @@ export default function RootPage() {
                                                                  style={{justifyContent: "space-evenly"}}>
                                                         <IconButton disabled={buttonsDisabled} onClick={() => {
                                                             setButtonsDisabled(true)
+                                                            console.log(Object.entries(group))
                                                             answerToJoinRequestMutation.mutate({
-                                                                userId: user.user_id,
+                                                                userId: user.id,
                                                                 groupId: group.group_id,
                                                                 choice: true
                                                             }, {
@@ -124,7 +128,7 @@ export default function RootPage() {
                                                         <IconButton disabled={buttonsDisabled} onClick={() => {
                                                             setButtonsDisabled(true)
                                                             answerToJoinRequestMutation.mutate({
-                                                                userId: user.user_id,
+                                                                userId: user.id,
                                                                 groupId: group.group_id,
                                                                 choice: false
                                                             }, {
@@ -135,7 +139,7 @@ export default function RootPage() {
                                                         </IconButton>
                                                     </CardActions>
                                                 </Card>
-                                            ))) : <Typography variant="body2">Emtpy</Typography>}
+                                            ))) : <Typography variant="body2">Emtpy</Typography>)}
                                     </Stack>
                                 </Menu>
                                 <IconButton size="large" color="inherit" onClick={
