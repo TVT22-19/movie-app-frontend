@@ -1,9 +1,9 @@
-import { alpha, InputBase, styled, IconButton } from "@mui/material";
-import { Search as SearchIcon } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import {alpha, IconButton, InputBase, styled} from "@mui/material";
+import {Search as SearchIcon} from "@mui/icons-material";
+import {useNavigate} from "react-router-dom";
+import {useState} from "react";
 
-const Search = styled('div')(({ theme }) => ({
+const Search = styled('div')(({theme}) => ({
     position: 'relative',
     flexGrow: 1,
     borderRadius: theme.shape.borderRadius,
@@ -20,17 +20,7 @@ const Search = styled('div')(({ theme }) => ({
     },
 }));
 
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
+const StyledInputBase = styled(InputBase)(({theme}) => ({
     color: 'inherit',
     width: '100%',
     '& .MuiInputBase-input': {
@@ -50,27 +40,21 @@ export function StyledField() {
     const [searchQuery, setSearchQuery] = useState<string>('');
 
     const handleSearch = () => {
-        if (searchQuery.trim() !== '') {
-
-            navigate(`/search/${encodeURIComponent(searchQuery)}`);
-        } else {
-
-            navigate('/search');
-        }
+        if (searchQuery.trim() !== '') navigate(`/search/${encodeURIComponent(searchQuery)}`); else navigate('/search');
     };
 
     return (
         <Search>
-            <div style={{ display: 'flex'}}>
+            <div style={{display: 'flex'}}>
                 <IconButton onClick={handleSearch}>
-                    <SearchIcon />
+                    <SearchIcon/>
                 </IconButton>
                 <StyledInputBase
                     placeholder="Search…"
-                    inputProps={{ 'aria-label': 'search' }}
+                    inputProps={{'aria-label': 'search'}}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()} 
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
             </div>
         </Search>

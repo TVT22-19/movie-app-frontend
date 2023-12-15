@@ -7,9 +7,7 @@ export default function NotFoundPage() {
     const location = useLocation()
     const [currentPath, setCurrentPath] = useState("")
 
-    useEffect(() => {
-        setCurrentPath(location.pathname);
-    }, [location]);
+    useEffect(() => setCurrentPath(location.pathname), [location]);
 
     return (
         <CenteredContainer>

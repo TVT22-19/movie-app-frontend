@@ -68,17 +68,14 @@ export default function RootPage() {
                     <Button variant="text" color="inherit" onClick={() => navigate("/")}>
                         <Typography variant="h6" noWrap>Movie App</Typography>
                     </Button>
-
                     <StyledField/>
-
                     <Box sx={{display: 'flex'}}>
                         <IconButton size="large" color="inherit" onClick={toggleColorMode}>
                             {theme.palette.mode === 'dark' ? <DarkMode/> : <LightMode/>}
                         </IconButton>
                         {isAuthorized ? <>
-                                <IconButton size="large" color="inherit" onClick={(event) => {
-                                    setNotifyAnchorEl(event.currentTarget)
-                                }}>
+                                <IconButton size="large" color="inherit"
+                                            onClick={(event) => setNotifyAnchorEl(event.currentTarget)}>
                                     <Badge badgeContent={data?.length} color="primary">
                                         <Notifications/>
                                     </Badge>
@@ -102,7 +99,7 @@ export default function RootPage() {
                                     }}
                                 >
                                     <Stack spacing={1}>
-                                        {((data && data.length > 0) ? data.map((group) =>
+                                        {(data && data.length > 0) ? data.map((group) =>
                                             group.requests.map((user) => (
                                                 <Card>
                                                     <CardContent>
@@ -139,12 +136,11 @@ export default function RootPage() {
                                                         </IconButton>
                                                     </CardActions>
                                                 </Card>
-                                            ))) : <Typography variant="body2">Emtpy</Typography>)}
+                                            ))) : <Typography variant="body2">Empty</Typography>}
                                     </Stack>
                                 </Menu>
-                                <IconButton size="large" color="inherit" onClick={
-                                    (event) => setProfileAnchorEl(event.currentTarget)
-                                }>
+                                <IconButton size="large" color="inherit"
+                                            onClick={(event) => setProfileAnchorEl(event.currentTarget)}>
                                     <AccountCircle/>
                                 </IconButton>
                                 <Menu

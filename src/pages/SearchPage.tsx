@@ -1,33 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Box,
     Button,
     Card,
     CardContent,
-    Container,
-    Grid,
-    TextField,
     CardMedia,
-    Typography,
-    useTheme,
-    Rating,
     FormControlLabel,
+    Grid,
     Radio,
-    RadioGroup
+    RadioGroup,
+    Rating,
+    TextField,
+    Typography
 } from '@mui/material';
 
-import { Movie, TVSeries } from './types';
-import { fetchMedia } from './movieAndSearchQueries';
-import { useNavigate, useParams } from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Movie, TVSeries} from "../services/types.ts";
+import {fetchMedia} from "../services/movieApi.ts";
 
-//TODO: hide "clear rating" if rating is set to 0, make the clear rating and clear year buttons prettier
-
-const hostUrl: string = "https://movie-app-backend-wjza.onrender.com"
-
-
-const SearchPage: React.FC = () => {
-    const { query } = useParams(); 
-    const [searchQuery, setSearchQuery] = useState<string>(query || ''); 
+export default function SearchPage() {
+    const {query} = useParams();
+    const [searchQuery, setSearchQuery] = useState<string>(query || '');
     const [year, setYear] = useState<number>(0);
     const [value, setValue] = React.useState<number | null>(0);
     const [isMovie, setIsMovie] = useState<boolean>(true); // default to searching for movies
@@ -54,12 +47,10 @@ const SearchPage: React.FC = () => {
             setIsLoading(true);
             const data = await fetchMedia(searchQuery, isMovie);
 
-            const filteredMediaByYear = year !== 0
-                ? data.filter((media: Movie | TVSeries) => {
-                    const releaseDate = isMovie ? (media as Movie).release_date : (media as TVSeries).first_air_date;
-                    return new Date(releaseDate).getFullYear() === year;
-                })
-                : data;
+            const filteredMediaByYear = year !== 0 ? data.filter((media: Movie | TVSeries) => {
+                const releaseDate = isMovie ? (media as Movie).release_date : (media as TVSeries).first_air_date;
+                return new Date(releaseDate).getFullYear() === year;
+            }) : data;
 
             const filteredMedia = value !== null
                 ? filteredMediaByYear.filter((media: Movie | TVSeries) => media.vote_average >= value * 2) // scaling to convert 5 stars to 0-10 scale
@@ -73,16 +64,11 @@ const SearchPage: React.FC = () => {
         }
     };
 
-    const handleClearYear = () => {
-        setYear(0);
-    };
+    const handleClearYear = () => setYear(0);
 
     const handleMovieClick = (movieId: number) => {
-        if (isMovie==true){
-        navigate(`/movie/${movieId}`);}
-      };
-
-    const theme = useTheme();
+        if (isMovie) navigate(`/movie/${movieId}`);
+    };
 
     return (
         <div>
@@ -98,8 +84,8 @@ const SearchPage: React.FC = () => {
                     value={isMovie ? 'movie' : 'tv'}
                     onChange={(e) => setIsMovie(e.target.value === 'movie')}
                 >
-                    <FormControlLabel value="movie" control={<Radio />} label="Movies" />
-                    <FormControlLabel value="tv" control={<Radio />} label="TV Series" />
+                    <FormControlLabel value="movie" control={<Radio/>} label="Movies"/>
+                    <FormControlLabel value="tv" control={<Radio/>} label="TV Series"/>
                 </RadioGroup>
 
                 <Grid container spacing={2}>
@@ -121,7 +107,7 @@ const SearchPage: React.FC = () => {
                             fullWidth
                             value={year !== 0 ? year : ''}
                             onChange={(e) => setYear(Number(e.target.value))}
-                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                            inputProps={{inputMode: 'numeric', pattern: '[0-9]*'}}
                         />
 
 
@@ -177,8 +163,9 @@ const SearchPage: React.FC = () => {
                     {isError && <div>Error loading movies</div>}
                     {mediaResults?.map((media) => (
                         <Grid item key={media.id} xs={12}>
-                            <div onClick={() => handleMovieClick(media.id)} style={{ cursor: isMovie ? 'pointer' : 'default' }}>
-                                <Card sx={{ display: 'flex' }}>
+                            <div onClick={() => handleMovieClick(media.id)}
+                                 style={{cursor: isMovie ? 'pointer' : 'default'}}>
+                                <Card sx={{display: 'flex'}}>
                                     <CardMedia
                                         component="img"
                                         alt={isMovie ? (media as Movie).title : (media as TVSeries).name}
@@ -190,15 +177,15 @@ const SearchPage: React.FC = () => {
                                             height: 'auto',
                                         }}
                                     />
-                                    <CardContent sx={{ flex: '90%' }}>
+                                    <CardContent sx={{flex: '90%'}}>
                                         <Typography variant="h6">
                                             {isMovie ? (media as Movie).title : (media as TVSeries).name}
                                         </Typography>
                                         <Typography variant="body2">
                                             Rating: {media.vote_average} / 10 |
                                             Year: {new Date(isMovie ? (media as Movie).release_date : (media as TVSeries).first_air_date).getFullYear()}
-                                            <br />
-                                            <br />
+                                            <br/>
+                                            <br/>
                                             {media.overview}
                                         </Typography>
                                     </CardContent>
@@ -211,6 +198,4 @@ const SearchPage: React.FC = () => {
 
         </div>
     );
-};
-
-export default SearchPage;
+}
