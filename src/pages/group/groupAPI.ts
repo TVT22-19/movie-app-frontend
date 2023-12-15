@@ -1,7 +1,7 @@
 
 import { GroupData, GroupUser, JoinRequestBody, Member, Post, UserRemovalBody } from "./types.ts";
 
-const hostUrl: string = "http://localhost:3001"
+const hostUrl: string = "https://movie-app-backend-wjza.onrender.com"
 
 
 export const fetchMembers = async (groupId: number): Promise <Member[]> => {
