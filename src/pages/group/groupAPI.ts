@@ -28,7 +28,7 @@ export const createDiscussionPost = async (title: string, content: string, group
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ title, userID, groupID, content })
+            body: JSON.stringify({ title: title, user_id: userID, group_id: groupID, content: content })
         });
 
         if (!response.ok) {
