@@ -27,6 +27,6 @@ export const useAnswerToJoinRequest = () => {
     return useMutation<void, Error, { userId: number, groupId: number, choice: boolean }>({
         mutationKey: ["createGroup"],
         mutationFn: (group) => answerToJoinRequest(group.userId, group.groupId, group.choice).then(data => data),
-        onSettled: () => queryClient.invalidateQueries({queryKey: ["group_invites", "fetchgroupsbyuser"]})
+        onSettled: () => queryClient.invalidateQueries({queryKey: ["group_invites"]})
     });
 }
