@@ -53,7 +53,7 @@ export default function RootPage() {
 
     const [buttonsDisabled, setButtonsDisabled] = useState(false)
 
-    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
+    const user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
     const {data} = useGroupInvites(user?.userId, isAuthorized)
     const answerToJoinRequestMutation = useAnswerToJoinRequest()
@@ -67,17 +67,14 @@ export default function RootPage() {
                     <Button variant="text" color="inherit" onClick={() => navigate("/")}>
                         <Typography variant="h6" noWrap>Movie App</Typography>
                     </Button>
-
                     <StyledField/>
-
                     <Box sx={{display: 'flex'}}>
                         <IconButton size="large" color="inherit" onClick={toggleColorMode}>
                             {theme.palette.mode === 'dark' ? <DarkMode/> : <LightMode/>}
                         </IconButton>
                         {isAuthorized ? <>
-                                <IconButton size="large" color="inherit" onClick={(event) => {
-                                    setNotifyAnchorEl(event.currentTarget)
-                                }}>
+                                <IconButton size="large" color="inherit"
+                                            onClick={(event) => setNotifyAnchorEl(event.currentTarget)}>
                                     <Notifications/>
                                 </IconButton>
                                 <Menu
@@ -135,12 +132,11 @@ export default function RootPage() {
                                                         </IconButton>
                                                     </CardActions>
                                                 </Card>
-                                            ))) : <Typography variant="body2">Emtpy</Typography>}
+                                            ))) : <Typography variant="body2">Empty</Typography>}
                                     </Stack>
                                 </Menu>
-                                <IconButton size="large" color="inherit" onClick={
-                                    (event) => setProfileAnchorEl(event.currentTarget)
-                                }>
+                                <IconButton size="large" color="inherit"
+                                            onClick={(event) => setProfileAnchorEl(event.currentTarget)}>
                                     <AccountCircle/>
                                 </IconButton>
                                 <Menu

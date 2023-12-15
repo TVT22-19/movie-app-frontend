@@ -1,7 +1,5 @@
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
-import {useState} from "react"
+import {Button, Dialog, DialogActions, DialogTitle} from "@mui/material";
 import {ProfileDeleteDialogProps} from "./types.ts";
-
 import {useDeleteUser} from "../../../services/users.ts"
 import {useAuth} from "../../../hooks/useAuth.tsx";
 import {useNavigate} from "react-router-dom";
@@ -12,13 +10,11 @@ export default function ProfileDeleteDialog(props: ProfileDeleteDialogProps) {
 
     const navigate = useNavigate()
 
-    const {isAuthorized, setToken} = useAuth()
+    const {setToken} = useAuth()
 
-    if(deleteUserMutation.isError){
-        console.log(deleteUserMutation.error)
-    }
+    if (deleteUserMutation.isError) console.log(deleteUserMutation.error)
 
-    function afterDeletion(){
+    function afterDeletion() {
         props.setOpen(false)
         setToken("")
         navigate("/")
@@ -31,17 +27,13 @@ export default function ProfileDeleteDialog(props: ProfileDeleteDialogProps) {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
-            <DialogTitle>
-                Are you sure you want to delete your user?
-            </DialogTitle>
+            <DialogTitle>Are you sure you want to delete your user?</DialogTitle>
             <DialogActions>
                 <Button onClick={() => props.setOpen(false)}>Cancel</Button>
-                <Button variant="contained" onClick={() => {
-                    deleteUserMutation.mutate((props.user.id!), {
-                        onSuccess: () => console.log("User deleted"),
-                        onSettled: () => afterDeletion()
-                    })
-                }} autoFocus color="error">
+                <Button variant="contained" onClick={() => deleteUserMutation.mutate((props.user.id!), {
+                    onSuccess: () => console.log("User deleted"),
+                    onSettled: () => afterDeletion()
+                })} autoFocus color="error">
                     Yes
                 </Button>
             </DialogActions>

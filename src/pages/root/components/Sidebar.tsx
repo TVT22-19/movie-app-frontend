@@ -12,15 +12,15 @@ import {
 import {Add, Group} from "@mui/icons-material";
 import {useAuth} from "../../../hooks/useAuth.tsx";
 import {useNavigate} from "react-router-dom";
-import {useFetchGroupsByUser} from "../../group/groupqueries.ts";
 import {User} from "../../../services/types.ts";
+import {useFetchGroupsByUser} from "../../../services/groups.ts";
 
 export default function Sidebar() {
 
     const drawerWidth = 240;
 
     const {isAuthorized, getToken} = useAuth();
-    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined
+    const user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined
     const userId = user?.userId;
 
     const {data: groupsData} = useFetchGroupsByUser(userId);

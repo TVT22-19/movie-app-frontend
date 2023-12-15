@@ -15,7 +15,7 @@ export default function LoginPage() {
     const [user, setUser] = useState<User>()
 
     const {isAuthorized, setToken, getToken} = useAuth()
-    let _user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
+    const _user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
     const {data, status, error} = useLogin(user)
 

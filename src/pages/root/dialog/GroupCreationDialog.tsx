@@ -14,24 +14,24 @@ export default function GroupCreationDialog(props: CreateGroupDialogProps) {
 
     const createGroupMutation = useGroupCreate()
     const {getToken} = useAuth()
-    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
+    const user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
-    function createGroup(groupname: string, groupdesc: string, groupavatar: string) {
+    function createGroup(groupName: string, groupDescription: string, groupAvatar: string) {
 
-        if (groupname.trim() === "" || groupdesc.trim() === "") {
+        if (groupName.trim() === "" || groupDescription.trim() === "") {
             console.log("Some required fields are empty")
             return
         }
 
-        if (groupavatar.trim() !== "" && !fetch(groupavatar).then(response => response.headers.get("Content-Type")?.includes("image"))) {
+        if (groupAvatar.trim() !== "" && !fetch(groupAvatar).then(response => response.headers.get("Content-Type")?.includes("image"))) {
             console.log("Incorrect avatar url")
             return
         }
 
         createGroupMutation.mutate({
-            gname: groupname,
-            gdesc: groupdesc,
-            gavatar: groupavatar,
+            gname: groupName,
+            gdesc: groupDescription,
+            gavatar: groupAvatar,
             owner: user?.userId
         } as GroupCreationBody, {
             onSuccess: () => props.setOpen(false)
@@ -40,9 +40,7 @@ export default function GroupCreationDialog(props: CreateGroupDialogProps) {
 
     return (
         <Dialog open={props.open} onClose={() => props.setOpen(false)}>
-            <DialogTitle>
-                Create new group
-            </DialogTitle>
+            <DialogTitle>Create new group</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} paddingY={1}>
                     <TextField label="Group name" variant="outlined" type="text"

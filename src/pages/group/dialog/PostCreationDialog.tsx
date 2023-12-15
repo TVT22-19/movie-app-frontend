@@ -3,34 +3,26 @@ import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack} from "
 import {useState} from "react";
 import {CreatePostDialogProps} from "./types.ts";
 
-export interface Post {
-    title: string,
-    content: string
-}
-
-export default function PostCreationDialog(props: CreatePostDialogProps & { handleCreatePost: Function }) {
+export default function PostCreationDialog(props: CreatePostDialogProps) {
 
     const [postTitle, setPostTitle] = useState<string>("")
     const [postContent, setPostContent] = useState<string>("")
-    
 
-    function createPost(groupname: string, groupdesc: string) {
 
-        if (groupname.trim() === "" || groupdesc.trim() === "") {
+    function createPost(groupName: string, groupDescription: string) {
+
+        if (groupName.trim() === "" || groupDescription.trim() === "") {
             console.log("Some required fields are empty")
             return;
         }
+
         props.handleCreatePost(postTitle, postContent);
-
         props.setOpen(false)
-
     }
 
     return (
         <Dialog open={props.open} onClose={() => props.setOpen(false)}>
-            <DialogTitle>
-                Create new post
-            </DialogTitle>
+            <DialogTitle>Create new post</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} paddingY={1}>
                     <TextField label="Post title" variant="outlined" type="text"

@@ -18,42 +18,35 @@ export default function ProfilePage() {
     const navigate = useNavigate()
 
     const profileId = Number(useParams().id)
-    if (Number.isNaN(profileId)) return <Navigate to="/page-not-found"/>
-    let user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
+    const user: User | undefined = getToken() ? JSON.parse(atob(getToken()!.split('.')[1])) : undefined;
 
     const isProfileOwner = (user?.userId === profileId) || false
 
     const {data: userData, status: userStatus, error: userError} = useUser(profileId)
     const {data: reviewData, status: reviewStatus, error: reviewError} = useReviews(profileId)
 
-    if(userStatus === "pending") return (<h1>Loading...</h1>)
+    if (Number.isNaN(profileId)) return <Navigate to="/page-not-found"/>
 
-    if(userStatus === "error"){
+    if (userStatus === "pending") return (<h1>Loading...</h1>)
+
+    if (userStatus === "error") {
         console.log(userError.message, {variant: "error"})
         return <Alert severity="error">User not exist</Alert>
     }
 
-    if(userStatus === "success"){
-        console.log("User data retrieved")
-    }
+    if (userStatus === "success") console.log("User data retrieved")
 
-    if(reviewStatus === "pending") return (<h1>Loading...</h1>)
+    if (reviewStatus === "pending") return (<h1>Loading...</h1>)
 
-    if(reviewStatus === "error"){
-        console.log(reviewError.message, {variant: "error"})
-    }
+    if (reviewStatus === "error") console.log(reviewError.message, {variant: "error"})
 
-    if(reviewStatus === "success"){
-        console.log("Reviews retrieved successfully")
-    }
+    if (reviewStatus === "success") console.log("Reviews retrieved successfully")
 
-      const handleMovieClick = (movieId: number) =>  {
-        navigate(`/movie/${movieId}`);
-    }
-    
+    const handleMovieClick = (movieId: number) => navigate(`/movie/${movieId}`)
+
     return (
         <>
-            <ProfileEditDialog open={openEditDialog} setOpen={setOpenEditDialog} user={userData!} />
+            <ProfileEditDialog open={openEditDialog} setOpen={setOpenEditDialog} user={userData!}/>
             <ProfileDeleteDialog open={openDeleteDialog} setOpen={setOpenDeleteDialog} user={userData!}/>
             <Stack spacing={2}>
                 <Card>
@@ -67,13 +60,13 @@ export default function ProfilePage() {
                             <Stack alignSelf="center" flexGrow={1}>
                                 <Typography>{userData?.username} ({userData?.firstname} {userData?.lastname})</Typography>
                                 <Typography>Age: {userData?.age}</Typography>
-                                <Typography>Registered: {new Date(userData?.registration_date!!).toLocaleDateString()}</Typography>
+                                <Typography>Registered: {new Date(userData.registration_date!).toLocaleDateString()}</Typography>
                             </Stack>
-                            { isProfileOwner! ? <Stack>
+                            {isProfileOwner! ? <Stack>
                                 <IconButton onClick={() => setOpenEditDialog(true)}>
                                     <Edit/>
                                 </IconButton>
-                                <IconButton onClick={() => setOpenDeleteDialog(true)} >
+                                <IconButton onClick={() => setOpenDeleteDialog(true)}>
                                     <Delete color="error"/>
                                 </IconButton>
                             </Stack> : <></>}
@@ -84,33 +77,29 @@ export default function ProfilePage() {
                 <Divider/>
 
                 <Typography variant="h4" textAlign="center">Reviews</Typography>
-                {reviewData?.length! > 0 ? reviewData?.map((data) =>
+                {(reviewData && reviewData?.length > 0) ? reviewData?.map((data) =>
                     <Card>
                         <CardContent>
-                             <Link component="button" 
-                                onClick={() => handleMovieClick(data.movie_id)}
-                                underline="always"> 
-                                 {data.movie_name}
-                                </Link>
-                            
+                            <Link component="button"
+                                  onClick={() => handleMovieClick(data.movie_id)}
+                                  underline="always">
+                                {data.movie_name}
+                            </Link>
                             <Stack alignSelf="end">
-                            {data.rating !== null && <Rating readOnly value={data.rating} />}
-                                
+                                {data.rating !== null && <Rating readOnly value={data.rating}/>}
                             </Stack>
                             <Stack spacing={2} direction="row" alignSelf="start">
                                 {data.content}
                             </Stack>
-                               
-                            
                         </CardContent>
                     </Card>
                 ) : <Card>
-                        <CardContent>
-                            <Stack>
-                                No reviews yet
-                            </Stack>
-                        </CardContent>
-                    </Card>}
+                    <CardContent>
+                        <Stack>
+                            No reviews yet
+                        </Stack>
+                    </CardContent>
+                </Card>}
             </Stack>
         </>
     )
