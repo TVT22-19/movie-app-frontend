@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Movie, TVSeries, Review } from "./types";
 
-const hostUrl: string = "http://localhost:3001";
+const hostUrl: string = "https://movie-app-backend-wjza.onrender.com";
 
 export const fetchMedia = async (query: string, isMovie: boolean) => {
     if (!query) {
